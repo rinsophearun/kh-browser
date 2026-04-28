@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+dist/
+build/
+*.egg-info/
+.DS_Store
+installer_output/
+*.dmg
+assets/icon_*.png
+assets/icon.iconset/

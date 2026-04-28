@@ -1,8 +1,14 @@
+# -*- coding: utf-8 -*-
 """
-build_icons.py  —  Auto-generate icon.icns (macOS) and icon.ico (Windows)
+build_icons.py  -  Auto-generate icon.icns (macOS) and icon.ico (Windows)
 Run this once before building, or it's called automatically by the build scripts.
 """
-import os, sys
+import os, sys, io
+
+# Force UTF-8 output on Windows (cp1252 can't print emoji)
+if sys.platform == "win32":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+
 os.makedirs("assets", exist_ok=True)
 
 # ── Generate base 512x512 PNG via PyQt6 ──────────────────────────────────────

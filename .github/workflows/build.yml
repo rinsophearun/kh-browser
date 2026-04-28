@@ -29,6 +29,8 @@ jobs:
 
       - name: Generate icons
         run: python build_icons.py
+        env:
+          PYTHONUTF8: "1"
 
       - name: Build EXE with PyInstaller
         run: |

@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AntiDetect Browser — UI Mockups</title>
+<style>
+  :root {
+    --bg:       #07090f;
+    --bg2:      #080c12;
+    --bg3:      #0d1117;
+    --bg4:      #0e1420;
+    --border:   #1a2236;
+    --border2:  #1e2d45;
+    --orange:   #f97316;
+    --orange2:  #fb923c;
+    --orange3:  #ea6c10;
+    --text:     #e2e8f0;
+    --text2:    #94a3b8;
+    --text3:    #475569;
+    --text4:    #334155;
+    --sidebar:  220px;
+    --green:    #22c55e;
+    --red:      #ef4444;
+    --blue:     #3b82f6;
+    --yellow:   #f59e0b;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; font-family: -apple-system, "Helvetica Neue", Arial; }
+  body { background:#030508; color:var(--text); overflow-x:hidden; }
+
+  /* ── Nav Bar ── */
+  .page-nav {
+    position:sticky; top:0; z-index:100;
+    background:#030508ee; backdrop-filter:blur(12px);
+    border-bottom:1px solid #1a2236;
+    display:flex; align-items:center; gap:6px;
+    padding:10px 20px;
+  }
+  .page-nav h1 { font-size:14px; font-weight:800; color:var(--orange); margin-right:16px; }
+  .nav-btn {
+    background:transparent; color:var(--text3); border:1px solid var(--border);
+    border-radius:8px; padding:6px 14px; font-size:12px; cursor:pointer;
+    transition:.15s;
+  }
+  .nav-btn:hover, .nav-btn.active { background:var(--orange); color:#fff; border-color:var(--orange); }
+
+  /* ── Section titles ── */
+  .mockup-section { padding:40px 32px 20px; }
+  .mockup-section h2 {
+    font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+    color:var(--text3); margin-bottom:6px;
+  }
+  .mockup-section h3 {
+    font-size:22px; font-weight:800; color:var(--text);
+    margin-bottom:4px;
+  }
+  .mockup-section p { font-size:13px; color:var(--text3); margin-bottom:24px; }
+
+  /* ── App shell ── */
+  .app-shell {
+    display:flex; height:680px;
+    border:1px solid var(--border); border-radius:16px;
+    overflow:hidden; box-shadow:0 32px 80px #000a;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width:var(--sidebar); min-width:var(--sidebar);
+    background:linear-gradient(135deg,#080b12,#0a0d16);
+    border-right:1px solid var(--border);
+    display:flex; flex-direction:column;
+  }
+  .sidebar-logo {
+    padding:20px 16px 16px;
+    border-bottom:1px solid var(--border);
+  }
+  .logo-mark {
+    display:flex; align-items:center; gap:10px;
+  }
+  .logo-icon {
+    width:36px; height:36px; border-radius:10px;
+    background:linear-gradient(135deg,#f97316,#c2410c);
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px;
+  }
+  .logo-text { font-size:13px; font-weight:800; color:var(--text); }
+  .logo-sub  { font-size:10px; color:var(--text3); margin-top:1px; }
+  .sidebar-section {
+    padding:16px 12px 4px;
+    font-size:9px; font-weight:700; letter-spacing:2px;
+    color:var(--text4); text-transform:uppercase;
+  }
+  .nav-item {
+    display:flex; align-items:center; gap:10px;
+    padding:9px 12px; margin:1px 8px;
+    border-radius:10px; cursor:pointer;
+    transition:.15s; position:relative;
+  }
+  .nav-item:hover { background:#0e1828; }
+  .nav-item.active {
+    background:linear-gradient(90deg,#1e2d45,#f9731608);
+    border-left:3px solid var(--orange);
+  }
+  .nav-icon { font-size:15px; width:26px; text-align:center; }
+  .nav-label { font-size:13px; font-weight:500; color:var(--text3); flex:1; }
+  .nav-item.active .nav-label { color:var(--orange); font-weight:700; }
+  .nav-dot {
+    width:3px; height:20px; border-radius:2px;
+    background:transparent;
+  }
+  .nav-item.active .nav-dot { background:var(--orange); }
+  .sidebar-spacer { flex:1; }
+  .user-card {
+    padding:14px 16px; border-top:1px solid var(--border);
+    background:linear-gradient(135deg,#0a0d16,#080b12);
+    display:flex; align-items:center; gap:10px;
+  }
+  .user-av {
+    width:36px; height:36px; border-radius:10px;
+    background:linear-gradient(135deg,#7c2d12,#f97316);
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:800; color:#fff;
+  }
+  .user-name { font-size:12px; font-weight:700; color:var(--text); }
+  .user-plan { font-size:10px; color:var(--text4); }
+  .online-dot { width:8px; height:8px; border-radius:50%; background:var(--green); margin-left:auto; }
+
+  /* ── Content area ── */
+  .content { flex:1; display:flex; flex-direction:column; background:var(--bg2); overflow:hidden; }
+
+  /* ── Top bar ── */
+  .topbar {
+    height:64px; min-height:64px;
+    background:linear-gradient(180deg,#0d1117,#080c12);
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:10px;
+    padding:0 20px;
+  }
+  .search-box {
+    flex:2; height:38px; background:#111827;
+    border:1px solid var(--border2); border-radius:10px;
+    display:flex; align-items:center; padding:0 14px;
+    font-size:13px; color:var(--text3); gap:8px;
+    max-width:340px;
+  }
+  .combo {
+    height:38px; background:#111827;
+    border:1px solid var(--border2); border-radius:10px;
+    display:flex; align-items:center; padding:0 12px;
+    font-size:12px; color:var(--text2); gap:6px;
+  }
+  .btn-orange {
+    height:38px; background:var(--orange);
+    border:none; border-radius:10px;
+    padding:0 18px; font-size:13px; font-weight:700;
+    color:#fff; cursor:pointer; white-space:nowrap;
+  }
+  .btn-dark {
+    height:38px; background:#1e2d45;
+    border:none; border-radius:10px;
+    padding:0 16px; font-size:13px; font-weight:600;
+    color:var(--text2); cursor:pointer; white-space:nowrap;
+  }
+
+  /* ── Sub-toolbar ── */
+  .subtoolbar {
+    height:46px; min-height:46px;
+    background:#080c12; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:8px; padding:0 20px;
+  }
+  .sm-btn {
+    height:30px; background:#111827;
+    border:1px solid var(--border2); border-radius:8px;
+    padding:0 12px; font-size:12px; font-weight:500;
+    color:var(--text2); cursor:pointer; white-space:nowrap;
+  }
+  .sm-btn.danger { color:#f87171; background:#1a0a0a; }
+  .sm-btn.success { color:var(--green); background:#0a1f13; }
+  .count-label { font-size:12px; color:var(--text4); padding:0 8px; }
+
+  /* ── Table ── */
+  .profile-table { flex:1; overflow-y:auto; }
+  table { width:100%; border-collapse:collapse; }
+  thead th {
+    background:#0d1117; color:var(--text3);
+    font-size:10px; font-weight:700;
+    text-transform:uppercase; letter-spacing:1px;
+    padding:10px 8px; border-bottom:1px solid var(--border);
+    border-right:1px solid var(--border); text-align:left;
+    white-space:nowrap;
+  }
+  thead th:last-child { border-right:none; }
+  tbody tr { border-bottom:1px solid #0d1117; }
+  tbody tr:nth-child(even) { background:#0a1018; }
+  tbody tr:hover { background:#0e1828; }
+  td { padding:0 8px; height:54px; vertical-align:middle; font-size:13px; }
+
+  /* ── Avatar ── */
+  .avatar {
+    width:34px; height:34px; border-radius:9px;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-size:14px; font-weight:800; color:#fff;
+    flex-shrink:0;
+  }
+  .profile-cell { display:flex; align-items:center; gap:10px; padding:0 8px; }
+  .profile-name { font-size:13px; font-weight:700; color:var(--text); }
+  .profile-id   { font-size:10px; color:var(--text4); }
+
+  /* ── Badges ── */
+  .badge {
+    display:inline-block; border-radius:6px;
+    padding:2px 9px; font-size:11px; font-weight:700;
+    white-space:nowrap;
+  }
+  .b-chrome  { background:#78350f; color:#fbbf24; }
+  .b-firefox { background:#7c2d12; color:#f97316; }
+  .b-edge    { background:#0c4a6e; color:#38bdf8; }
+  .b-safari  { background:#064e3b; color:#34d399; }
+  .b-brave   { background:#881337; color:#fb7185; }
+  .b-win     { background:#1e3a5f; color:#60a5fa; }
+  .b-mac     { background:#1a2040; color:#818cf8; }
+  .b-lin     { background:#1e2d45; color:#94a3b8; }
+  .b-running { background:#052e16; color:#22c55e; border:1px solid #16a34a40; }
+  .b-stopped { background:#0f172a; color:#475569; border:1px solid #1e2d4540; }
+
+  .act-btn {
+    width:30px; height:30px; border-radius:8px;
+    border:none; cursor:pointer;
+    font-size:13px; display:inline-flex;
+    align-items:center; justify-content:center;
+  }
+  .act-launch { background:#14532d30; color:var(--green); border:1px solid #14532d; }
+  .act-stop   { background:#450a0a30; color:#f87171; border:1px solid #450a0a; }
+  .act-edit   { background:#111827; color:var(--text2); border:1px solid #111827; }
+  .act-more   { background:#111827; color:var(--text2); border:1px solid #111827; }
+  .acts { display:flex; gap:5px; align-items:center; padding:0 6px; }
+
+  /* ── Status bar ── */
+  .statusbar {
+    height:28px; background:#040608;
+    border-top:1px solid var(--border);
+    display:flex; align-items:center;
+    padding:0 16px; font-size:11px; color:var(--text4);
+    gap:6px;
+  }
+  .status-dot { color:var(--green); }
+
+  /* ── Dashboard ── */
+  .dashboard { flex:1; overflow-y:auto; padding:20px; background:var(--bg2); }
+  .dash-strip {
+    background:linear-gradient(90deg,#1a2236,#0d1117);
+    border:1px solid var(--border); border-radius:12px;
+    padding:12px 20px; margin-bottom:16px;
+    display:flex; align-items:center; gap:24px;
+  }
+  .dash-strip-item { display:flex; align-items:center; gap:8px; font-size:12px; }
+  .strip-dot { width:8px; height:8px; border-radius:50%; }
+  .strip-label { color:var(--text3); }
+  .strip-val   { color:var(--text); font-weight:700; }
+  .blink { animation:blink 1.2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  .stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px; }
+  .stat-card {
+    background:var(--bg3); border:1px solid var(--border);
+    border-radius:14px; padding:18px 20px;
+    position:relative; overflow:hidden;
+  }
+  .stat-accent {
+    position:absolute; right:0; top:0; bottom:0;
+    width:4px; border-radius:0 14px 14px 0;
+  }
+  .stat-label { font-size:11px; color:var(--text3); font-weight:600; margin-bottom:8px; }
+  .stat-value { font-size:32px; font-weight:900; line-height:1; margin-bottom:4px; }
+  .stat-sub   { font-size:11px; color:var(--text3); }
+
+  .chart-grid { display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-bottom:16px; }
+  .chart-card {
+    background:var(--bg3); border:1px solid var(--border);
+    border-radius:14px; padding:16px 20px;
+  }
+  .chart-title { font-size:12px; font-weight:700; color:var(--text2); margin-bottom:14px; }
+  .bar-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .bar-label { font-size:11px; color:var(--text3); width:60px; text-align:right; }
+  .bar-track { flex:1; height:8px; background:#1a2236; border-radius:4px; overflow:hidden; }
+  .bar-fill  { height:100%; border-radius:4px; }
+  .bar-val   { font-size:11px; color:var(--text2); font-weight:700; width:28px; }
+
+  .donut-wrap { display:flex; align-items:center; justify-content:center; position:relative; }
+  .donut-svg  { transform:rotate(-90deg); }
+  .donut-center {
+    position:absolute; text-align:center;
+    font-size:22px; font-weight:900; color:var(--orange);
+  }
+  .donut-sub { font-size:10px; color:var(--text3); }
+
+  .activity-card {
+    background:var(--bg3); border:1px solid var(--border);
+    border-radius:14px; padding:16px 20px;
+  }
+  .activity-item { display:flex; align-items:flex-start; gap:10px; margin-bottom:12px; }
+  .act-icon-w {
+    width:28px; height:28px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; flex-shrink:0;
+  }
+  .act-msg   { font-size:12px; color:var(--text2); }
+  .act-time  { font-size:10px; color:var(--text3); margin-top:2px; }
+
+  /* ── Groups ── */
+  .groups-area { flex:1; overflow-y:auto; padding:20px; }
+  .groups-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .group-card {
+    background:var(--bg3); border:1px solid var(--border);
+    border-radius:14px; padding:18px; cursor:pointer;
+    transition:.15s; position:relative; overflow:hidden;
+  }
+  .group-card:hover { border-color:var(--orange); transform:translateY(-2px); }
+  .group-card-accent {
+    position:absolute; top:0; left:0; right:0; height:3px; border-radius:14px 14px 0 0;
+  }
+  .group-icon-row { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+  .group-icon {
+    width:44px; height:44px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center; font-size:22px;
+  }
+  .group-name { font-size:15px; font-weight:800; color:var(--text); }
+  .group-desc { font-size:11px; color:var(--text3); margin-top:1px; }
+  .group-stats { display:flex; gap:16px; margin-top:10px; }
+  .gs-item { font-size:11px; color:var(--text3); }
+  .gs-val  { font-size:16px; font-weight:800; display:block; }
+
+  /* ── Team dialog ── */
+  .dialog-shell {
+    border:1px solid var(--border); border-radius:16px;
+    overflow:hidden; box-shadow:0 32px 80px #000a;
+  }
+  .dialog-header {
+    background:linear-gradient(180deg,#0d1117,#080c12);
+    border-bottom:1px solid var(--border);
+    padding:0 24px; height:66px;
+    display:flex; align-items:center; gap:12px;
+  }
+  .dlg-title { font-size:16px; font-weight:800; color:var(--text); }
+  .dlg-sub   { font-size:11px; color:var(--text3); }
+  .tab-bar {
+    display:flex; background:#07090f;
+    border-bottom:1px solid var(--border);
+  }
+  .tab-item {
+    padding:12px 20px; font-size:12px; font-weight:500;
+    color:var(--text3); cursor:pointer; border-bottom:2px solid transparent;
+  }
+  .tab-item.active { color:var(--orange); border-bottom-color:var(--orange); font-weight:700; }
+
+  .stat-chip {
+    width:96px; height:56px; border-radius:10px;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    gap:2px;
+  }
+  .chip-val  { font-size:20px; font-weight:900; line-height:1; }
+  .chip-lbl  { font-size:10px; color:var(--text3); }
+
+  .member-row {
+    display:flex; align-items:center; height:50px;
+    border-bottom:1px solid #0d1117; padding:0 16px; gap:12px;
+  }
+  .member-row:hover { background:#0e1828; }
+  .m-av {
+    width:32px; height:32px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:800; color:#fff; flex-shrink:0;
+  }
+  .m-name  { font-size:13px; font-weight:600; color:var(--text); flex:1; }
+  .m-email { font-size:12px; color:var(--text3); width:200px; }
+
+  /* ── Role cards ── */
+  .role-card {
+    border-radius:12px; padding:16px 20px; margin-bottom:10px;
+  }
+  .role-title { font-size:14px; font-weight:800; }
+  .role-desc  { font-size:12px; color:var(--text3); }
+  .perm-grid  { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+  .perm-item  {
+    display:flex; align-items:center; gap:6px;
+    font-size:12px; color:var(--text2);
+  }
+  .perm-check { width:14px; height:14px; border-radius:4px; flex-shrink:0; }
+
+  /* ── Transfer tab ── */
+  .transfer-card {
+    max-width:500px; margin:40px auto;
+    background:var(--bg3); border:1px solid var(--border);
+    border-radius:16px; padding:36px 40px; text-align:center;
+  }
+  .crown { font-size:52px; display:block; margin-bottom:12px; }
+  .transfer-title { font-size:20px; font-weight:800; color:var(--text); margin-bottom:8px; }
+  .transfer-desc  { font-size:13px; color:var(--text3); margin-bottom:20px; line-height:1.6; }
+  .warn-box {
+    background:#451a0340; border:1px solid #f59e0b40;
+    border-radius:10px; padding:14px 16px;
+    font-size:12px; color:#fcd34d; margin:16px 0; text-align:left;
+  }
+  .select-fake {
+    height:42px; background:var(--bg4);
+    border:1px solid var(--border2); border-radius:10px;
+    display:flex; align-items:center; padding:0 14px;
+    font-size:13px; color:var(--text2); margin:10px 0; text-align:left;
+    justify-content:space-between;
+  }
+  .btn-danger {
+    width:100%; height:46px; border:none; border-radius:12px;
+    background:linear-gradient(90deg,#7f1d1d,#ef4444);
+    color:#fff; font-size:14px; font-weight:800; cursor:pointer; margin-top:8px;
+  }
+
+  /* ── New Profile dialog ── */
+  .np-dialog {
+    border:1px solid var(--border); border-radius:16px; overflow:hidden;
+  }
+  .np-header {
+    background:linear-gradient(180deg,#0d1117,#080c12);
+    padding:18px 24px; border-bottom:1px solid var(--border);
+  }
+  .np-title { font-size:16px; font-weight:800; color:var(--text); }
+  .np-body  { display:flex; }
+  .np-tabs  {
+    width:160px; background:#07090f;
+    border-right:1px solid var(--border);
+    padding:12px 8px;
+  }
+  .np-tab {
+    padding:9px 12px; border-radius:8px; margin-bottom:2px;
+    font-size:12px; font-weight:500; color:var(--text3); cursor:pointer;
+    display:flex; align-items:center; gap:8px;
+  }
+  .np-tab.active { background:#1e2d45; color:var(--orange); font-weight:700; }
+  .np-form { flex:1; padding:20px 24px; }
+  .form-row { margin-bottom:14px; }
+  .form-label { font-size:11px; font-weight:600; color:var(--text3); margin-bottom:5px; display:block; }
+  .form-input {
+    width:100%; height:38px; background:var(--bg4);
+    border:1px solid var(--border2); border-radius:10px;
+    padding:0 12px; font-size:13px; color:var(--text2);
+    display:flex; align-items:center;
+  }
+  .form-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .np-footer {
+    background:#07090f; border-top:1px solid var(--border);
+    padding:14px 24px; display:flex; justify-content:flex-end; gap:10px;
+  }
+
+  /* ── Page layout ── */
+  .screens { display:flex; flex-direction:column; gap:60px; padding-bottom:60px; }
+  .chip-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+  .page-chip {
+    background:var(--bg3); border:1px solid var(--border2);
+    border-radius:20px; padding:4px 14px;
+    font-size:11px; color:var(--orange); font-weight:700;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width:5px; height:5px; }
+  ::-webkit-scrollbar-track { background:#0a0d16; }
+  ::-webkit-scrollbar-thumb { background:var(--orange); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="page-nav">
+  <h1>🛡️ AntiDetect</h1>
+  <button class="nav-btn active" onclick="show('profiles')">Profiles</button>
+  <button class="nav-btn" onclick="show('dashboard')">Dashboard</button>
+  <button class="nav-btn" onclick="show('groups')">Groups</button>
+  <button class="nav-btn" onclick="show('team')">Team</button>
+  <button class="nav-btn" onclick="show('newprofile')">New Profile</button>
+  <button class="nav-btn" onclick="show('transfer')">Transfer BOSS</button>
+</div>
+
+<div class="screens" id="root">
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 1 — PROFILES
+════════════════════════════════════════════════════════════════════ -->
+<div id="sc-profiles">
+<div class="mockup-section">
+  <h2>Screen 01</h2>
+  <h3>Profiles — Main Table View</h3>
+  <p>11-column table with avatar, browser/OS badges, proxy, fingerprint, status, actions</p>
+</div>
+<div class="app-shell">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">🛡️</div>
+        <div>
+          <div class="logo-text">AntiDetect</div>
+          <div class="logo-sub">Browser Manager v2</div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-section">Workspace</div>
+    <div class="nav-item" onclick="show('dashboard')"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span><div class="nav-dot"></div></div>
+    <div class="nav-item active"><span class="nav-icon">🌐</span><span class="nav-label">Profiles</span><div class="nav-dot"></div></div>
+    <div class="nav-item" onclick="show('groups')"><span class="nav-icon">📁</span><span class="nav-label">Groups</span><div class="nav-dot"></div></div>
+    <div class="sidebar-section">Automation</div>
+    <div class="nav-item"><span class="nav-icon">🤖</span><span class="nav-label">RPA Tasks</span><div class="nav-dot"></div></div>
+    <div class="nav-item"><span class="nav-icon">⚡</span><span class="nav-label">Batch Ops</span><div class="nav-dot"></div></div>
+    <div class="sidebar-section">Collaboration</div>
+    <div class="nav-item" onclick="show('team')"><span class="nav-icon">👥</span><span class="nav-label">Team</span><div class="nav-dot"></div></div>
+    <div class="nav-item"><span class="nav-icon">🔗</span><span class="nav-label">Open API</span><div class="nav-dot"></div></div>
+    <div class="sidebar-section">System</div>
+    <div class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span><div class="nav-dot"></div></div>
+    <div class="sidebar-spacer"></div>
+    <div class="user-card">
+      <div class="user-av">JS</div>
+      <div><div class="user-name">John Smith</div><div class="user-plan">Owner · Pro Plan</div></div>
+      <div class="online-dot"></div>
+    </div>
+  </div>
+  <!-- Content -->
+  <div class="content">
+    <div class="topbar">
+      <div class="search-box">🔍&nbsp; Search profiles, proxy, browser…</div>
+      <div class="combo">📁 All Groups ▾</div>
+      <div class="combo">⚡ All Status ▾</div>
+      <div style="flex:1"></div>
+      <button class="btn-orange" onclick="show('newprofile')">✨  New Profile</button>
+      <button class="btn-dark">⚡ Batch</button>
+      <button class="btn-dark">☁️ Sync</button>
+    </div>
+    <div class="subtoolbar">
+      <button class="sm-btn">☐ Select All</button>
+      <span class="count-label">8 shown · 2 running · 8 total</span>
+      <div style="flex:1"></div>
+      <button class="sm-btn success">▶ Open</button>
+      <button class="sm-btn">🔗 Share</button>
+      <button class="sm-btn">🔄 Transfer</button>
+      <button class="sm-btn danger">🗑 Delete</button>
+    </div>
+    <div class="profile-table">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:38px"></th>
+            <th style="width:40px">#</th>
+            <th>Profile</th>
+            <th style="width:110px">Group</th>
+            <th style="width:100px">Browser</th>
+            <th style="width:90px">OS</th>
+            <th style="width:115px">Proxy</th>
+            <th style="width:125px">Fingerprint</th>
+            <th style="width:96px">Status</th>
+            <th style="width:105px">Last Used</th>
+            <th style="width:150px">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Row 1 -->
+          <tr>
+            <td style="text-align:center"><input type="checkbox" style="accent-color:#f97316"></td>
+            <td style="color:#334155;text-align:center">1</td>
+            <td><div class="profile-cell"><div class="avatar" style="background:linear-gradient(135deg,#7c3aed,#4c1d95)">S</div><div><div class="profile-name">Social Media 01</div><div class="profile-id">#A1B2C3D4 ☁️</div></div></div></td>
+            <td><span style="color:#f97316;font-size:8px">● </span><span style="color:#94a3b8;font-size:12px">Marketing</span></td>
+            <td><span class="badge b-chrome">Chrome</span></td>
+            <td><span class="badge b-win">Windows</span></td>
+            <td><span style="color:#64748b;font-size:12px">104.28.1.0:8080</span></td>
+            <td><span style="color:#64748b;font-size:11px">1920×1080 · en-US</span></td>
+            <td><span class="badge b-running">● Running</span></td>
+            <td><span style="color:#64748b;font-size:12px">just now</span></td>
+            <td><div class="acts"><button class="act-btn act-stop">⏹</button><button class="act-btn act-edit">✏️</button><button class="act-btn act-edit">📋</button><button class="act-btn act-more">⋯</button></div></td>
+          </tr>
+          <tr>
+            <td style="text-align:center"><input type="checkbox" style="accent-color:#f97316"></td>
+            <td style="color:#334155;text-align:center">2</td>
+            <td><div class="profile-cell"><div class="avatar" style="background:linear-gradient(135deg,#f97316,#7c2d12)">E</div><div><div class="profile-name">E-Commerce Pro</div><div class="profile-id">#B320D678</div></div></div></td>
+            <td><span style="color:#f97316;font-size:8px">● </span><span style="color:#94a3b8;font-size:12px">Shopping</span></td>
+            <td><span class="badge b-firefox">Firefox</span></td>
+            <td><span class="badge b-mac">macOS</span></td>
+            <td><span style="color:#64748b;font-size:12px">192.168.1.1:3128</span></td>
+            <td><span style="color:#64748b;font-size:11px">2560×1440 · en-GB</span></td>
+            <td><span class="badge b-stopped">● Stopped</span></td>
+            <td><span style="color:#64748b;font-size:12px">2h ago</span></td>
+            <td><div class="acts"><button class="act-btn act-launch">▶</button><button class="act-btn act-edit">✏️</button><button class="act-btn act-edit">📋</button><button class="act-btn act-more">⋯</button></div></td>
+          </tr>
+          <tr>
+            <td style="text-align:center"><input type="checkbox" style="accent-color:#f97316"></td>
+            <td style="color:#334155;text-align:center">3</td>
+            <td><div class="profile-cell"><div class="avatar" style="background:linear-gradient(135deg,#10b981,#064e3b)">A</div><div><div class="profile-name">Ads Account 03</div><div class="profile-id">#C9D0E1F2 ☁️</div></div></div></td>
+            <td><span style="color:#f97316;font-size:8px">● </span><span style="color:#94a3b8;font-size:12px">Ads</span></td>
+            <td><span class="badge b-edge">Edge</span></td>
+            <td><span class="badge b-win">Windows</span></td>
+            <td><span style="color:#64748b;font-size:12px">45.77.22.11:1080</span></td>
+            <td><span style="color:#64748b;font-size:11px">1366×768 · fr-FR</span></td>
+            <td><span class="badge b-running">● Running</span></td>
+            <td><span style="color:#64748b;font-size:12px">5m ago</span></td>
+            <td><div class="acts"><button class="act-btn act-stop">⏹</button><button class="act-btn act-edit">✏️</button><button class="act-btn act-edit">📋</button><button class="act-btn act-more">⋯</button></div></td>
+          </tr>
+          <tr>
+            <td style="text-align:center"><input type="checkbox" style="accent-color:#f97316"></td>
+            <td style="color:#334155;text-align:center">4</td>
+            <td><div class="profile-cell"><div class="avatar" style="background:linear-gradient(135deg,#3b82f6,#1e3a8a)">T</div><div><div class="profile-name">TikTok Farm 04</div><div class="profile-id">#D4E5F6G7</div></div></div></td>
+            <td><span style="color:#f97316;font-size:8px">● </span><span style="color:#94a3b8;font-size:12px">Social</span></td>
+            <td><span class="badge b-chrome">Chrome</span></td>
+            <td><span class="badge b-win">Windows</span></td>
+            <td><span style="color:#64748b;font-size:12px">172.16.0.1:8888</span></td>
+            <td><span style="color:#64748b;font-size:11px">1280×720 · ko-KR</span></td>
+            <td><span class="badge b-stopped">● Stopped</span></td>
+            <td><span style="color:#64748b;font-size:12px">1d ago</span></td>
+            <td><div class="acts"><button class="act-btn act-launch">▶</button><button class="act-btn act-edit">✏️</button><button class="act-btn act-edit">📋</button><button class="act-btn act-more">⋯</button></div></td>
+          </tr>
+          <tr>
+            <td style="text-align:center"><input type="checkbox" style="accent-color:#f97316"></td>
+            <td style="color:#334155;text-align:center">5</td>
+            <td><div class="profile-cell"><div class="avatar" style="background:linear-gradient(135deg,#ec4899,#831843)">B</div><div><div class="profile-name">Bot Account 05</div><div class="profile-id">#E5F6G7H8</div></div></div></td>
+            <td><span style="color:#f97316;font-size:8px">● </span><span style="color:#94a3b8;font-size:12px">Bots</span></td>
+            <td><span class="badge b-brave">Brave</span></td>
+            <td><span class="badge b-lin">Linux</span></td>
+            <td><span style="color:#64748b;font-size:12px">10.0.0.1:9050</span></td>
+            <td><span style="color:#64748b;font-size:11px">1920×1200 · de-DE</span></td>
+            <td><span class="badge b-stopped">● Stopped</span></td>
+            <td><span style="color:#64748b;font-size:12px">3h ago</span></td>
+            <td><div class="acts"><button class="act-btn act-launch">▶</button><button class="act-btn act-edit">✏️</button><button class="act-btn act-edit">📋</button><button class="act-btn act-more">⋯</button></div></td>
+          </tr>
+          <tr>
+            <td style="text-align:center"><input type="checkbox" style="accent-color:#f97316"></td>
+            <td style="color:#334155;text-align:center">6</td>
+            <td><div class="profile-cell"><div class="avatar" style="background:linear-gradient(135deg,#f59e0b,#78350f)">Y</div><div><div class="profile-name">YouTube Creator</div><div class="profile-id">#F11B1BB7 ☁️</div></div></div></td>
+            <td><span style="color:#f97316;font-size:8px">● </span><span style="color:#94a3b8;font-size:12px">Content</span></td>
+            <td><span class="badge b-safari">Safari</span></td>
+            <td><span class="badge b-mac">macOS</span></td>
+            <td><span style="color:#64748b;font-size:12px">Direct</span></td>
+            <td><span style="color:#64748b;font-size:11px">2560×1600 · en-US</span></td>
+            <td><span class="badge b-stopped">● Stopped</span></td>
+            <td><span style="color:#64748b;font-size:12px">2d ago</span></td>
+            <td><div class="acts"><button class="act-btn act-launch">▶</button><button class="act-btn act-edit">✏️</button><button class="act-btn act-edit">📋</button><button class="act-btn act-more">⋯</button></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="statusbar">
+      <span class="status-dot">●</span>
+      AntiDetect Browser Manager &nbsp;|&nbsp; 8 profiles &nbsp;|&nbsp; <span style="color:#22c55e">2 running</span> &nbsp;|&nbsp; Cloud: Connected &nbsp;|&nbsp; v2.0.0
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 2 — DASHBOARD
+════════════════════════════════════════════════════════════════════ -->
+<div id="sc-dashboard" style="display:none">
+<div class="mockup-section">
+  <h2>Screen 02</h2>
+  <h3>Real-Time Dashboard</h3>
+  <p>Animated stats, activity feed, browser usage chart, uptime counter</p>
+</div>
+<div class="app-shell">
+  <div class="sidebar">
+    <div class="sidebar-logo"><div class="logo-mark"><div class="logo-icon">🛡️</div><div><div class="logo-text">AntiDetect</div><div class="logo-sub">Browser Manager v2</div></div></div></div>
+    <div class="sidebar-section">Workspace</div>
+    <div class="nav-item active"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span><div class="nav-dot"></div></div>
+    <div class="nav-item" onclick="show('profiles')"><span class="nav-icon">🌐</span><span class="nav-label">Profiles</span><div class="nav-dot"></div></div>
+    <div class="nav-item" onclick="show('groups')"><span class="nav-icon">📁</span><span class="nav-label">Groups</span><div class="nav-dot"></div></div>
+    <div class="sidebar-section">Automation</div>
+    <div class="nav-item"><span class="nav-icon">🤖</span><span class="nav-label">RPA Tasks</span><div class="nav-dot"></div></div>
+    <div class="nav-item"><span class="nav-icon">⚡</span><span class="nav-label">Batch Ops</span><div class="nav-dot"></div></div>
+    <div class="sidebar-section">Collaboration</div>
+    <div class="nav-item" onclick="show('team')"><span class="nav-icon">👥</span><span class="nav-label">Team</span><div class="nav-dot"></div></div>
+    <div class="nav-item"><span class="nav-icon">🔗</span><span class="nav-label">Open API</span><div class="nav-dot"></div></div>
+    <div class="sidebar-section">System</div>
+    <div class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span><div class="nav-dot"></div></div>
+    <div class="sidebar-spacer"></div>
+    <div class="user-card"><div class="user-av">JS</div><div><div class="user-name">John Smith</div><div class="user-plan">Owner · Pro Plan</div></div><div class="online-dot"></div></div>
+  </div>
+  <div class="content">
+    <div class="dashboard">
+      <!-- Live strip -->
+      <div class="dash-strip">
+        <div class="dash-strip-item"><span class="strip-dot blink" style="background:#22c55e"></span><span class="strip-label">Live</span><span class="strip-val">2 Running</span></div>
+        <div style="width:1px;height:20px;background:#1a2236"></div>
+        <div class="dash-strip-item">🕐 <span class="strip-label">Uptime</span><span class="strip-val" id="uptime">00:14:32</span></div>
+        <div style="width:1px;height:20px;background:#1a2236"></div>
+        <div class="dash-strip-item">📅 <span class="strip-label">Today</span><span class="strip-val">Mon, Apr 28 · 22:06</span></div>
+        <div style="flex:1"></div>
+        <span style="font-size:11px;color:#334155">Auto-refresh: 3s</span>
+      </div>
+      <!-- Stat cards -->
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-accent" style="background:#f97316"></div><div class="stat-label">TOTAL PROFILES</div><div class="stat-value" style="color:#f97316">8</div><div class="stat-sub">+2 this week</div></div>
+        <div class="stat-card"><div class="stat-accent" style="background:#22c55e"></div><div class="stat-label">RUNNING NOW</div><div class="stat-value" style="color:#22c55e">2</div><div class="stat-sub">25% of total</div></div>
+        <div class="stat-card"><div class="stat-accent" style="background:#3b82f6"></div><div class="stat-label">TEAM MEMBERS</div><div class="stat-value" style="color:#3b82f6">4</div><div class="stat-sub">3 active today</div></div>
+      </div>
+      <!-- Charts -->
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-title">Browser Distribution</div>
+          <div class="bar-row"><div class="bar-label">Chrome</div><div class="bar-track"><div class="bar-fill" style="width:62%;background:linear-gradient(90deg,#f97316,#fb923c)"></div></div><div class="bar-val">5</div></div>
+          <div class="bar-row"><div class="bar-label">Firefox</div><div class="bar-track"><div class="bar-fill" style="width:25%;background:linear-gradient(90deg,#f97316,#fb923c)"></div></div><div class="bar-val">2</div></div>
+          <div class="bar-row"><div class="bar-label">Brave</div><div class="bar-track"><div class="bar-fill" style="width:12%;background:linear-gradient(90deg,#f97316,#fb923c)"></div></div><div class="bar-val">1</div></div>
+          <div style="margin-top:14px"><div class="chart-title">OS Distribution</div></div>
+          <div class="bar-row"><div class="bar-label">Windows</div><div class="bar-track"><div class="bar-fill" style="width:50%;background:linear-gradient(90deg,#3b82f6,#60a5fa)"></div></div><div class="bar-val">4</div></div>
+          <div class="bar-row"><div class="bar-label">macOS</div><div class="bar-track"><div class="bar-fill" style="width:37%;background:linear-gradient(90deg,#3b82f6,#60a5fa)"></div></div><div class="bar-val">3</div></div>
+          <div class="bar-row"><div class="bar-label">Linux</div><div class="bar-track"><div class="bar-fill" style="width:12%;background:linear-gradient(90deg,#3b82f6,#60a5fa)"></div></div><div class="bar-val">1</div></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Active Rate</div>
+          <div class="donut-wrap" style="height:120px">
+            <svg class="donut-svg" width="110" height="110" viewBox="0 0 110 110">
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#1a2236" stroke-width="12"/>
+              <circle cx="55" cy="55" r="42" fill="none" stroke="#f97316" stroke-width="12"
+                stroke-dasharray="66 198" stroke-linecap="round"/>
+            </svg>
+            <div class="donut-center"><div>25%</div><div class="donut-sub">Active</div></div>
+          </div>
+          <div style="display:flex;justify-content:space-around;margin-top:8px">
+            <div style="text-align:center"><div style="font-size:18px;font-weight:900;color:#22c55e">2</div><div style="font-size:10px;color:#475569">Running</div></div>
+            <div style="text-align:center"><div style="font-size:18px;font-weight:900;color:#475569">6</div><div style="font-size:10px;color:#475569">Stopped</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- Activity -->
+      <div class="activity-card">
+        <div class="chart-title" style="margin-bottom:10px">🕐 Recent Activity</div>
+        <div class="activity-item"><div class="act-icon-w" style="background:#052e1660;color:#22c55e">▶</div><div><div class="act-msg">Launched: <b>Social Media 01</b></div><div class="act-time">just now</div></div></div>
+        <div class="activity-item"><div class="act-icon-w" style="background:#052e1660;color:#22c55e">▶</div><div><div class="act-msg">Launched: <b>Ads Account 03</b></div><div class="act-time">5m ago</div></div></div>
+        <div class="activity-item"><div class="act-icon-w" style="background:#450a0a60;color:#ef4444">⏹</div><div><div class="act-msg">Stopped: <b>E-Commerce Pro</b></div><div class="act-time">2h ago</div></div></div>
+        <div class="activity-item"><div class="act-icon-w" style="background:#1e1a0060;color:#f59e0b">✏️</div><div><div class="act-msg">Profile updated: <b>Bot Account 05</b></div><div class="act-time">3h ago</div></div></div>
+      </div>
+    </div>
+    <div class="statusbar"><span class="status-dot">●</span> AntiDetect Browser Manager &nbsp;|&nbsp; 8 profiles &nbsp;|&nbsp; <span style="color:#22c55e">2 running</span> &nbsp;|&nbsp; v2.0.0</div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 3 — GROUPS
+════════════════════════════════════════════════════════════════════ -->
+<div id="sc-groups" style="display:none">
+<div class="mockup-section">
+  <h2>Screen 03</h2>
+  <h3>Groups Manager</h3>
+  <p>Custom icon, color, description — persistent storage</p>
+</div>
+<div class="app-shell">
+  <div class="sidebar">
+    <div class="sidebar-logo"><div class="logo-mark"><div class="logo-icon">🛡️</div><div><div class="logo-text">AntiDetect</div><div class="logo-sub">Browser Manager v2</div></div></div></div>
+    <div class="sidebar-section">Workspace</div>
+    <div class="nav-item" onclick="show('dashboard')"><span class="nav-icon">📊</span><span class="nav-label">Dashboard</span><div class="nav-dot"></div></div>
+    <div class="nav-item" onclick="show('profiles')"><span class="nav-icon">🌐</span><span class="nav-label">Profiles</span><div class="nav-dot"></div></div>
+    <div class="nav-item active"><span class="nav-icon">📁</span><span class="nav-label">Groups</span><div class="nav-dot"></div></div>
+    <div class="sidebar-spacer"></div>
+    <div class="user-card"><div class="user-av">JS</div><div><div class="user-name">John Smith</div><div class="user-plan">Owner · Pro Plan</div></div><div class="online-dot"></div></div>
+  </div>
+  <div class="content">
+    <div class="topbar">
+      <div style="font-size:16px;font-weight:800;color:var(--text)">📁  Groups</div>
+      <div style="flex:1"></div>
+      <button class="btn-orange">＋  New Group</button>
+    </div>
+    <div class="groups-area">
+      <div class="groups-grid">
+        <!-- Group cards -->
+        <div class="group-card"><div class="group-card-accent" style="background:#f97316"></div><div class="group-icon-row"><div class="group-icon" style="background:#f9731620">📢</div><div><div class="group-name">Marketing</div><div class="group-desc">Social media campaigns</div></div></div><div class="group-stats"><div class="gs-item"><span class="gs-val" style="color:#f97316">3</span>Profiles</div><div class="gs-item"><span class="gs-val" style="color:#22c55e">1</span>Running</div></div></div>
+        <div class="group-card"><div class="group-card-accent" style="background:#3b82f6"></div><div class="group-icon-row"><div class="group-icon" style="background:#3b82f620">🛒</div><div><div class="group-name">Shopping</div><div class="group-desc">E-commerce accounts</div></div></div><div class="group-stats"><div class="gs-item"><span class="gs-val" style="color:#3b82f6">2</span>Profiles</div><div class="gs-item"><span class="gs-val" style="color:#475569">0</span>Running</div></div></div>
+        <div class="group-card"><div class="group-card-accent" style="background:#22c55e"></div><div class="group-icon-row"><div class="group-icon" style="background:#22c55e20">📊</div><div><div class="group-name">Ads</div><div class="group-desc">Advertising accounts</div></div></div><div class="group-stats"><div class="gs-item"><span class="gs-val" style="color:#22c55e">2</span>Profiles</div><div class="gs-item"><span class="gs-val" style="color:#22c55e">1</span>Running</div></div></div>
+        <div class="group-card"><div class="group-card-accent" style="background:#ec4899"></div><div class="group-icon-row"><div class="group-icon" style="background:#ec489920">🎵</div><div><div class="group-name">Social</div><div class="group-desc">TikTok &amp; Instagram</div></div></div><div class="group-stats"><div class="gs-item"><span class="gs-val" style="color:#ec4899">1</span>Profiles</div><div class="gs-item"><span class="gs-val" style="color:#475569">0</span>Running</div></div></div>
+        <div class="group-card"><div class="group-card-accent" style="background:#f59e0b"></div><div class="group-icon-row"><div class="group-icon" style="background:#f59e0b20">🎬</div><div><div class="group-name">Content</div><div class="group-desc">Video &amp; creators</div></div></div><div class="group-stats"><div class="gs-item"><span class="gs-val" style="color:#f59e0b">1</span>Profiles</div><div class="gs-item"><span class="gs-val" style="color:#475569">0</span>Running</div></div></div>
+        <div class="group-card" style="border-style:dashed;border-color:#1e2d45;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;cursor:pointer;min-height:120px">
+          <div style="font-size:28px;color:#334155">＋</div>
+          <div style="font-size:13px;color:#334155;font-weight:600">New Group</div>
+        </div>
+      </div>
+    </div>
+    <div class="statusbar"><span class="status-dot">●</span> 5 groups &nbsp;|&nbsp; 8 profiles &nbsp;|&nbsp; v2.0.0</div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 4 — TEAM
+════════════════════════════════════════════════════════════════════ -->
+<div id="sc-team" style="display:none">
+<div class="mockup-section">
+  <h2>Screen 04</h2>
+  <h3>Team Management</h3>
+  <p>Members, Roles &amp; Permissions, Devices, Transfer BOSS</p>
+</div>
+<div class="dialog-shell" style="max-height:640px;overflow:hidden;display:flex;flex-direction:column;">
+  <div class="dialog-header">
+    <span style="font-size:22px">👥</span>
+    <div style="flex:1"><div class="dlg-title">Team Management</div><div style="font-size:11px;color:#475569">4 members · Pro Plan</div></div>
+    <button class="btn-orange" style="height:38px;padding:0 20px;border:none;border-radius:10px;cursor:pointer;">＋ Invite Member</button>
+  </div>
+  <div class="tab-bar">
+    <div class="tab-item active">👤  Members</div>
+    <div class="tab-item" onclick="showTeamTab('roles')">🔑  Roles &amp; Permissions</div>
+    <div class="tab-item" onclick="showTeamTab('devices')">💻  Devices</div>
+    <div class="tab-item" onclick="show('transfer')">👑  Transfer BOSS</div>
+  </div>
+  <!-- Stat chips -->
+  <div style="display:flex;gap:10px;padding:14px 20px 10px;background:var(--bg2)">
+    <div class="stat-chip" style="background:#f9731618;border:1px solid #f9731640"><div class="chip-val" style="color:#f97316">4</div><div class="chip-lbl">Total</div></div>
+    <div class="stat-chip" style="background:#22c55e18;border:1px solid #22c55e40"><div class="chip-val" style="color:#22c55e">3</div><div class="chip-lbl">Active</div></div>
+    <div class="stat-chip" style="background:#3b82f618;border:1px solid #3b82f640"><div class="chip-val" style="color:#3b82f6">2</div><div class="chip-lbl">Admins</div></div>
+    <div class="stat-chip" style="background:#f59e0b18;border:1px solid #f59e0b40"><div class="chip-val" style="color:#f59e0b">1</div><div class="chip-lbl">Invited</div></div>
+  </div>
+  <!-- Search row -->
+  <div style="display:flex;gap:8px;padding:0 20px 12px;background:var(--bg2)">
+    <div class="search-box" style="max-width:none;flex:2">🔍 Search members…</div>
+    <div class="combo">All Roles ▾</div>
+    <div class="combo">All Status ▾</div>
+  </div>
+  <!-- Member list -->
+  <div style="flex:1;overflow-y:auto;background:var(--bg2)">
+    <div class="member-row"><div class="m-av" style="background:linear-gradient(135deg,#451a03,#f97316)">J</div><div class="m-name">John Smith</div><div class="m-email">john@company.com</div><span class="badge" style="background:#451a03;color:#fbbf24;margin-right:8px">Owner</span><span class="badge b-running" style="margin-right:8px">Active</span><button class="sm-btn" style="height:28px;font-size:11px">✏️ Edit</button><button class="sm-btn danger" style="height:28px;font-size:11px;margin-left:4px">🗑 Remove</button></div>
+    <div class="member-row"><div class="m-av" style="background:linear-gradient(135deg,#064e3b,#34d399)">S</div><div class="m-name">Sarah Lee</div><div class="m-email">sarah@company.com</div><span class="badge" style="background:#064e3b;color:#34d399;margin-right:8px">Admin</span><span class="badge b-running" style="margin-right:8px">Active</span><button class="sm-btn" style="height:28px;font-size:11px">✏️ Edit</button><button class="sm-btn danger" style="height:28px;font-size:11px;margin-left:4px">🗑 Remove</button></div>
+    <div class="member-row"><div class="m-av" style="background:linear-gradient(135deg,#1e2d45,#94a3b8)">M</div><div class="m-name">Mike Chen</div><div class="m-email">mike@company.com</div><span class="badge" style="background:#1e2d45;color:#94a3b8;margin-right:8px">Member</span><span class="badge b-running" style="margin-right:8px">Active</span><button class="sm-btn" style="height:28px;font-size:11px">✏️ Edit</button><button class="sm-btn danger" style="height:28px;font-size:11px;margin-left:4px">🗑 Remove</button></div>
+    <div class="member-row"><div class="m-av" style="background:linear-gradient(135deg,#0c4a6e,#38bdf8)">T</div><div class="m-name">Tom Davis</div><div class="m-email">tom@company.com</div><span class="badge" style="background:#1e2d45;color:#94a3b8;margin-right:8px">Member</span><span class="badge" style="background:#451a0380;color:#f59e0b;border:1px solid #f59e0b40;margin-right:8px">Invited</span><button class="sm-btn" style="height:28px;font-size:11px">✏️ Edit</button><button class="sm-btn danger" style="height:28px;font-size:11px;margin-left:4px">🗑 Remove</button></div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 5 — NEW PROFILE DIALOG
+════════════════════════════════════════════════════════════════════ -->
+<div id="sc-newprofile" style="display:none">
+<div class="mockup-section">
+  <h2>Screen 05</h2>
+  <h3>New Profile — Create Dialog</h3>
+  <p>Tabbed form: Basic Info, Fingerprint, Proxy, Platform, Extensions</p>
+</div>
+<div class="np-dialog" style="max-width:780px;margin:0 auto">
+  <div class="np-header"><div class="np-title">✨  Create New Profile</div><div style="font-size:12px;color:#475569;margin-top:2px">Configure browser identity and isolation settings</div></div>
+  <div class="np-body" style="min-height:440px">
+    <div class="np-tabs">
+      <div class="np-tab active">🪪  Basic Info</div>
+      <div class="np-tab">🖥️  Fingerprint</div>
+      <div class="np-tab">🔌  Proxy</div>
+      <div class="np-tab">🏪  Platforms</div>
+      <div class="np-tab">🧩  Extensions</div>
+      <div class="np-tab">⚙️  Advanced</div>
+    </div>
+    <div class="np-form">
+      <div class="form-row"><label class="form-label">Profile Name *</label><div class="form-input">Social Media Profile 01</div></div>
+      <div class="form-row-2">
+        <div class="form-row"><label class="form-label">Browser</label><div class="form-input" style="justify-content:space-between">Chrome 120 <span>▾</span></div></div>
+        <div class="form-row"><label class="form-label">Group</label><div class="form-input" style="justify-content:space-between">Marketing <span>▾</span></div></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-row"><label class="form-label">Operating System</label><div class="form-input" style="justify-content:space-between">Windows 11 <span>▾</span></div></div>
+        <div class="form-row"><label class="form-label">Language</label><div class="form-input" style="justify-content:space-between">en-US <span>▾</span></div></div>
+      </div>
+      <div class="form-row"><label class="form-label">Notes</label><div class="form-input" style="height:64px;align-items:flex-start;padding-top:8px;color:#334155">Optional description…</div></div>
+      <div class="form-row-2">
+        <div class="form-row" style="display:flex;align-items:center;gap:10px;margin-bottom:0"><input type="checkbox" checked style="accent-color:#f97316"><label class="form-label" style="margin:0">Cloud Sync</label></div>
+        <div class="form-row" style="display:flex;align-items:center;gap:10px;margin-bottom:0"><input type="checkbox" style="accent-color:#f97316"><label class="form-label" style="margin:0">Random Fingerprint</label></div>
+      </div>
+    </div>
+  </div>
+  <div class="np-footer">
+    <button class="btn-dark" style="height:40px">Cancel</button>
+    <button class="btn-orange" style="height:40px">✨  Create Profile</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCREEN 6 — TRANSFER BOSS
+════════════════════════════════════════════════════════════════════ -->
+<div id="sc-transfer" style="display:none">
+<div class="mockup-section">
+  <h2>Screen 06</h2>
+  <h3>Transfer BOSS Ownership</h3>
+  <p>Irreversible action — transfer Owner role to an Admin</p>
+</div>
+<div class="dialog-shell" style="max-width:680px;margin:0 auto">
+  <div class="dialog-header">
+    <span style="font-size:22px">👥</span>
+    <div style="flex:1"><div class="dlg-title">Team Management</div></div>
+  </div>
+  <div class="tab-bar">
+    <div class="tab-item" onclick="show('team')">👤  Members</div>
+    <div class="tab-item">🔑  Roles &amp; Permissions</div>
+    <div class="tab-item">💻  Devices</div>
+    <div class="tab-item active">👑  Transfer BOSS</div>
+  </div>
+  <div style="background:var(--bg2);padding:16px 24px">
+    <div class="transfer-card" style="margin:0 auto">
+      <span class="crown">👑</span>
+      <div class="transfer-title">Transfer Team Ownership</div>
+      <div class="transfer-desc">Transfer your BOSS (Owner) role to an Admin member.<br>After transfer you will become an Admin. This is irreversible.</div>
+      <div style="text-align:left;margin-bottom:6px;font-size:12px;color:#94a3b8;font-weight:600">Transfer ownership to:</div>
+      <div class="select-fake">🛡️  Sarah Lee  (sarah@company.com) <span style="color:#475569">▾</span></div>
+      <div class="warn-box">⚠️  This action is permanent and cannot be undone.<br>Make sure you trust the selected member.</div>
+      <button class="btn-danger">👑  Transfer Ownership Now</button>
+    </div>
+  </div>
+</div>
+</div>
+
+</div><!-- end .screens -->
+
+<script>
+const screens = ['profiles','dashboard','groups','team','newprofile','transfer'];
+function show(id) {
+  screens.forEach(s => {
+    const el = document.getElementById('sc-' + s);
+    if (el) el.style.display = (s === id) ? '' : 'none';
+  });
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase().includes(id));
+  });
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// Uptime counter
+let s=872;
+setInterval(()=>{
+  s++;
+  const h=String(Math.floor(s/3600)).padStart(2,'0');
+  const m=String(Math.floor((s%3600)/60)).padStart(2,'0');
+  const sec=String(s%60).padStart(2,'0');
+  const el=document.getElementById('uptime');
+  if(el) el.textContent=`${h}:${m}:${sec}`;
+},1000);
+</script>
+</body>
+</html>

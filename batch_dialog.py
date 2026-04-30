@@ -4,9 +4,13 @@ from PyQt6.QtWidgets import (
     QTabWidget, QWidget, QTextEdit, QComboBox, QGroupBox,
     QGridLayout, QCheckBox, QSpinBox, QProgressBar, QFrame,
     QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView,
-    QFileDialog, QMessageBox
+    QFileDialog, QMessageBox, QLineEdit, QRadioButton
 )
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtCore import Qt, QTimer, QCoreApplication
+import random
+from datetime import datetime
+from profile_dialog import BrowserProfile
+from storage import save_profiles
 
 
 def _h_sep():
@@ -144,7 +148,6 @@ class BatchDialog(QDialog):
         grid.addWidget(self.count_spin, 0, 1)
 
         grid.addWidget(QLabel("Prefix"), 1, 0)
-        from PyQt6.QtWidgets import QLineEdit
         self.prefix_edit = QLineEdit("Profile")
         grid.addWidget(self.prefix_edit, 1, 1)
 
@@ -196,18 +199,57 @@ class BatchDialog(QDialog):
 
     def _run_create(self):
         count = self.count_spin.value()
+        prefix = self.prefix_edit.text().strip() or "Profile"
+        group = self.create_group.currentText()
+        browser = self.create_browser.currentText()
+        os_type = self.create_os.currentText()
+        
+        if count < 1 or count > 500:
+            QMessageBox.warning(self, "Validation Error", "❌  Count must be between 1 and 500")
+            return
+        
         self.create_progress.setVisible(True)
         self.create_progress.setValue(0)
-        timer = QTimer(self)
-        step = [0]
-        def tick():
-            step[0] += max(1, 100 // count)
-            self.create_progress.setValue(min(step[0], 100))
-            if step[0] >= 100:
-                timer.stop()
-                QMessageBox.information(self, "Create", f"✅  {count} profiles created successfully!")
-        timer.timeout.connect(tick)
-        timer.start(40)
+        
+        # Actually create profiles
+        created = 0
+        try:
+            browsers = ["Chrome", "Firefox", "Edge"] if browser == "Random" else [browser]
+            os_types = ["Windows", "macOS", "Linux"] if os_type == "Random" else [os_type]
+            
+            for i in range(count):
+                name = f"{prefix}_{i+1:03d}"
+                profile = BrowserProfile(
+                    name=name,
+                    group=group,
+                    browser_type=random.choice(browsers),
+                    os_type=random.choice(os_types),
+                    created_at=datetime.now().isoformat()
+                )
+                
+                if self.rand_fp_cb.isChecked():
+                    profile.fingerprint.user_agent = f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 KHTML like Gecko Chrome/{random.randint(100,130)}.0.0.0 Safari/537.36"
+                if self.rand_screen_cb.isChecked():
+                    profile.fingerprint.screen_width = random.choice([1024, 1280, 1366, 1440, 1920])
+                    profile.fingerprint.screen_height = random.choice([600, 720, 768, 900, 1080])
+                
+                self.profiles.append(profile)
+                created += 1
+                
+                progress = int((i + 1) / count * 100)
+                self.create_progress.setValue(progress)
+                
+                QCoreApplication.processEvents()
+            
+            # Save profiles
+            save_profiles(self.profiles)
+            
+            QMessageBox.information(self, "Success", f"✅  {created} profiles created and saved successfully!")
+            self.accept()
+            
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"❌  Failed to create profiles:\n{str(e)}")
+            self.create_progress.setVisible(False)
 
     # ── Update ──────────────────────────────────────────────────────────────────
     def _build_update_tab(self):
@@ -221,7 +263,6 @@ class BatchDialog(QDialog):
 
         sel_gb = QGroupBox("Target Profiles")
         sel_lay = QVBoxLayout(sel_gb)
-        from PyQt6.QtWidgets import QRadioButton
         self.all_radio = QRadioButton("All profiles")
         self.group_radio = QRadioButton("Profiles in group:")
         self.all_radio.setChecked(True)
@@ -294,7 +335,6 @@ class BatchDialog(QDialog):
 
         fmt_gb = QGroupBox("Export Format")
         fmt_lay = QHBoxLayout(fmt_gb)
-        from PyQt6.QtWidgets import QRadioButton
         self.exp_json = QRadioButton("JSON")
         self.exp_csv = QRadioButton("CSV")
         self.exp_json.setChecked(True)

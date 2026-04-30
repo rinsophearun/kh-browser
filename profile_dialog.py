@@ -659,9 +659,28 @@ class ProfileDialog(QDialog):
     def _save(self):
         basic = self.basic_tab.get_data()
         if not basic["name"]:
-            QMessageBox.warning(self, "Validation", "Profile name is required.")
+            QMessageBox.warning(self, "Validation Error", "❌  Profile name is required.")
             return
 
+        # Create temporary profile with collected data for validation
+        temp_profile = BrowserProfile(**basic)
+        temp_profile.fingerprint = Fingerprint(**self.fp_tab.get_data())
+        
+        tz_data = self.tz_tab.get_data()
+        for k, v in tz_data.items():
+            setattr(temp_profile.fingerprint, k, v)
+        
+        temp_profile.proxy = self.proxy_tab.get_data()
+        temp_profile.accounts = self.accts_tab.get_data()
+        temp_profile.extensions = self.ext_tab.get_data()
+
+        # Validate profile against all rules
+        is_valid, error_msg = temp_profile.validate()
+        if not is_valid:
+            QMessageBox.warning(self, "Validation Error", f"❌  {error_msg}")
+            return
+
+        # Apply validated data to actual profile
         for k, v in basic.items():
             setattr(self.profile, k, v)
 
@@ -677,5 +696,6 @@ class ProfileDialog(QDialog):
         self.profile.accounts = self.accts_tab.get_data()
         self.profile.extensions = self.ext_tab.get_data()
 
+        QMessageBox.information(self, "Success", "✅  Profile saved successfully with all validation rules passed.")
         self.profile_saved.emit(self.profile)
         self.accept()

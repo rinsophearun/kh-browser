@@ -19,13 +19,8 @@ import storage
 from styles import DARK_THEME
 from profile_dialog import ProfileDialog
 from batch_dialog import BatchDialog
-from team_dialog import TeamDialog, ShareProfileDialog, TransferDialog
-from rpa_dialog import RPADialog
-from settings_dialog import SettingsDialog
-from api_dialog import APIDialog
 from browser_launcher import launch_profile, stop_profile
 from dashboard_panel import DashboardPanel
-from groups_panel import GroupsPanel
 
 
 # ── Badge widget ──────────────────────────────────────────────────────────────
@@ -61,17 +56,15 @@ class Sidebar(QWidget):
     NAV_ITEMS = [
         ("dashboard", "📊", "Dashboard"),
         ("profiles",  "📋", "Profiles"),
-        ("groups",    "📁", "Groups"),
-        ("team",      "👥", "Team"),
-        ("rpa",       "🤖", "RPA Tasks"),
-        ("api",       "🔌", "Open API"),
-        ("settings",  "⚙️", "Settings"),
+        ("videocreator", "🎥", "Video Creator"),
+        ("downvideo", "🎬", "DownVideo"),
+        ("fbmanager", "👥", "FB Manager"),
+        ("grokauto",  "🤖", "Grok Auto"),
+        ("flowauto",  "⚡", "Flow Auto"),
     ]
 
     NAV_SECTIONS = {
         "profiles": "WORKSPACE",
-        "team":     "COLLABORATION",
-        "settings": "SYSTEM",
     }
 
     def __init__(self):
@@ -89,14 +82,14 @@ class Sidebar(QWidget):
 
         # ── Logo area ─────────────────────────────────────────────────────────
         logo_w = QWidget()
-        logo_w.setFixedHeight(80)
+        logo_w.setFixedHeight(120)
         logo_w.setStyleSheet("""
             background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
                 stop:0 #0e1420, stop:1 #080b12);
-            border-bottom: 1px solid #141a28;
+            border-bottom: 2px solid #1e2d45;
         """)
         ll = QHBoxLayout(logo_w)
-        ll.setContentsMargins(10, 8, 10, 8)
+        ll.setContentsMargins(12, 12, 12, 12)
         ll.setSpacing(0)
 
         import os as _os
@@ -105,12 +98,15 @@ class Sidebar(QWidget):
         logo_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
         _pm = QPixmap(_logo_path)
         if not _pm.isNull():
-            logo_lbl.setPixmap(_pm.scaled(180, 60,
+            logo_lbl.setPixmap(_pm.scaled(200, 80,
                 Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation))
         else:
             logo_lbl.setText("KH Browser")
-            logo_lbl.setStyleSheet("color:#f97316; font-size:16px; font-weight:800;")
+            logo_lbl.setStyleSheet("""
+                color:#f97316; font-size:20px; font-weight:900;
+                letter-spacing:1px;
+            """)
 
         ll.addWidget(logo_lbl, 1)
         lay.addWidget(logo_w)
@@ -193,6 +189,41 @@ class Sidebar(QWidget):
         scroll_lay.addStretch()
         lay.addWidget(scroll_w, 1)
 
+        # ── Settings button ───────────────────────────────────────────────────
+        settings_w = QWidget()
+        settings_w.setFixedHeight(50)
+        settings_w.setStyleSheet("""
+            background: transparent;
+            border-top: 1px solid #141a28;
+        """)
+        settings_lay = QHBoxLayout(settings_w)
+        settings_lay.setContentsMargins(12, 8, 12, 8)
+        settings_lay.setSpacing(10)
+
+        settings_btn = QPushButton("⚙️  Settings")
+        settings_btn.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #1e2d45, stop:1 #0e1420);
+                color: #94a3b8;
+                border: 1px solid #1e2d4550;
+                border-radius: 8px;
+                font-size: 12px;
+                font-weight: 700;
+                padding: 6px 10px;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #2563EB30, stop:1 #1e293b);
+                color: #2563EB;
+                border-color: #2563EB30;
+            }
+        """)
+        settings_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        settings_lay.addWidget(settings_btn)
+        self.settings_btn = settings_btn
+        lay.addWidget(settings_w)
+
         # ── Bottom user card ──────────────────────────────────────────────────
         bottom = QWidget()
         bottom.setFixedHeight(70)
@@ -217,7 +248,7 @@ class Sidebar(QWidget):
 
         uinfo = QVBoxLayout()
         uinfo.setSpacing(2)
-        u1 = QLabel("John Smith")
+        u1 = QLabel("BY SOPHEARUN")
         u1.setStyleSheet("color:#e2e8f0; font-size:12px; font-weight:700;")
         u2 = QLabel("Owner · Pro Plan")
         u2.setStyleSheet("color:#334155; font-size:10px;")
@@ -290,6 +321,9 @@ class ProfilePanel(QWidget):
         if not saved:                          # first ever run → persist sample data
             storage.save_profiles(self.profiles)
         self._processes = {}   # profile.id → subprocess.Popen
+        # Pagination state
+        self.current_page = 0
+        self.profiles_per_page = 8  # Show 8 profiles per page for cleaner layout
         self._build()
         self._populate()
 
@@ -318,50 +352,108 @@ class ProfilePanel(QWidget):
         lay.setContentsMargins(0, 0, 0, 0)
         lay.setSpacing(0)
 
-        # ── Top bar ───────────────────────────────────────────────────────────
+        # ── Top bar with gradient ─────────────────────────────────────────────
         top = QWidget()
-        top.setFixedHeight(64)
+        top.setFixedHeight(80)
         top.setStyleSheet("""
-            background: qlineargradient(x1:0,y1:0,x2:0,y2:1,
-                stop:0 #0d1117, stop:1 #080c12);
-            border-bottom: 1px solid #1a2236;
+            QWidget {
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:0,
+                    stop:0 #0a0d16, stop:0.5 #0f1520, stop:1 #0a0d16);
+                border-bottom: 2px solid;
+                border-image: linear-gradient(90deg, #f97316, #fb923c, #f97316) 0 0 1 0;
+            }
         """)
         tl = QHBoxLayout(top)
-        tl.setContentsMargins(20, 0, 20, 0)
-        tl.setSpacing(10)
+        tl.setContentsMargins(28, 14, 28, 14)
+        tl.setSpacing(14)
 
-        # Search
+        # Search with gradient border
         self.search_box = QLineEdit()
-        self.search_box.setPlaceholderText("🔍  Search by name, group, browser, proxy…")
-        self.search_box.setFixedHeight(38)
+        self.search_box.setPlaceholderText("🔍  Search profiles…")
+        self.search_box.setFixedHeight(42)
         self.search_box.setMinimumWidth(300)
         self.search_box.setStyleSheet("""
             QLineEdit {
-                background:#111827; color:#e2e8f0;
-                border:1px solid #1e2d45; border-radius:10px;
-                padding:0 14px; font-size:13px;
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #0d1115, stop:1 #111827);
+                color: #e2e8f0;
+                border: 2px solid #1e2d45;
+                border-radius: 14px;
+                padding: 0 20px;
+                font-size: 14px;
+                font-weight: 500;
+                selection-background-color: #f9731640;
             }
-            QLineEdit:focus { border:1px solid #f97316; }
+            QLineEdit:focus {
+                border: 2px solid #f97316;
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #0f1520, stop:1 #141820);
+                color: #f1f5f9;
+            }
+            QLineEdit:hover {
+                border: 2px solid #f9731660;
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #0e1420, stop:1 #111827);
+            }
         """)
         self.search_box.textChanged.connect(self._filter)
 
-        # Filters
+        # Filters with enhanced styling
         filter_style = """
             QComboBox {
-                background:#111827; color:#94a3b8;
-                border:1px solid #1e2d45; border-radius:10px;
-                padding:0 12px; height:38px; font-size:12px;
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #0d1115, stop:1 #111827);
+                color: #94a3b8;
+                border: 2px solid #1e2d45;
+                border-radius: 12px;
+                padding: 0 14px;
+                height: 42px;
+                font-size: 13px;
+                font-weight: 500;
             }
-            QComboBox:hover { border:1px solid #f97316; }
-            QComboBox::drop-down { border:none; width:24px; }
+            QComboBox:hover {
+                border: 2px solid #f9731660;
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #0e1420, stop:1 #111827);
+                color: #cbd5e1;
+            }
+            QComboBox:focus {
+                border: 2px solid #f97316;
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #0f1520, stop:1 #141820);
+                color: #f1f5f9;
+            }
+            QComboBox::drop-down {
+                border: none;
+                width: 24px;
+                image: url(noimg);
+            }
             QComboBox QAbstractItemView {
-                background:#111827; color:#e2e8f0;
-                border:1px solid #1e2d45; selection-background-color:#1e3a5f;
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #0d1115, stop:1 #111827);
+                color: #e2e8f0;
+                border: 2px solid #1e2d45;
+                border-radius: 10px;
+                padding: 6px;
+                selection-background-color: #f9731640;
+            }
+            QComboBox QAbstractItemView::item {
+                padding: 8px 12px;
+                border-radius: 8px;
+            }
+            QComboBox QAbstractItemView::item:hover {
+                background: #1a2840;
+                border-radius: 8px;
+            }
+            QComboBox QAbstractItemView::item:selected {
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #f97316, stop:1 #fb923c);
+                color: #111827;
             }
         """
         self.group_filter = QComboBox()
-        self.group_filter.setFixedHeight(38)
-        self.group_filter.setMinimumWidth(130)
+        self.group_filter.setFixedHeight(42)
+        self.group_filter.setMinimumWidth(160)
         self.group_filter.setStyleSheet(filter_style)
         self.group_filter.addItem("📁  All Groups")
         for g in sorted(set(p.group for p in self.profiles)):
@@ -369,8 +461,8 @@ class ProfilePanel(QWidget):
         self.group_filter.currentTextChanged.connect(self._filter)
 
         self.status_filter = QComboBox()
-        self.status_filter.setFixedHeight(38)
-        self.status_filter.setMinimumWidth(120)
+        self.status_filter.setFixedHeight(42)
+        self.status_filter.setMinimumWidth(150)
         self.status_filter.setStyleSheet(filter_style)
         for s in ["⚡  All Status", "🟢  Running", "⬜  Stopped"]:
             self.status_filter.addItem(s)
@@ -381,74 +473,129 @@ class ProfilePanel(QWidget):
         tl.addWidget(self.status_filter)
         tl.addStretch()
 
-        # Action buttons
+        # Action buttons with gradient effects
         btn_configs = [
-            ("✨  New Profile", "#f97316", "#c2410c", self._new_profile),
-            ("⚡  Batch",       "#1e2d45", "#253555", self._batch),
-            ("☁️  Sync",        "#1e2d45", "#253555", self._sync),
+            ("✨  New Profile", "#f97316", "#fb923c", "#c2410c", self._new_profile),
+            ("⚡  Batch",       "#1e3a5f", "#2a5a8f", "#0f1f35", self._batch),
+            ("☁️  Sync",        "#1e3a5f", "#2a5a8f", "#0f1f35", self._sync),
         ]
-        for label, bg, hover, handler in btn_configs:
+        for label, bg, hover, active, handler in btn_configs:
             b = QPushButton(label)
-            b.setFixedHeight(38)
+            b.setFixedHeight(42)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
             b.setStyleSheet(f"""
                 QPushButton {{
-                    background:{bg}; color:#f1f5f9;
-                    border:none; border-radius:10px;
-                    padding:0 18px; font-size:13px; font-weight:600;
+                    background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                        stop:0 {bg}, stop:1 rgba(249,115,22,0.1));
+                    color: #f1f5f9;
+                    border: none;
+                    border-radius: 14px;
+                    padding: 0 24px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    letter-spacing: 0.3px;
                 }}
-                QPushButton:hover {{ background:{hover}; }}
+                QPushButton:hover {{
+                    background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                        stop:0 {hover}, stop:1 rgba(249,115,22,0.2));
+                }}
+                QPushButton:pressed {{
+                    background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                        stop:0 {active}, stop:1 rgba(249,115,22,0.3));
+                    opacity: 0.95;
+                }}
             """)
             b.clicked.connect(handler)
             tl.addWidget(b)
         lay.addWidget(top)
 
-        # ── Sub-toolbar ───────────────────────────────────────────────────────
+        # ── Sub-toolbar with gradient separator ──────────────────────────────
         sub = QWidget()
-        sub.setFixedHeight(46)
-        sub.setStyleSheet("background:#080c12; border-bottom:1px solid #1a2236;")
+        sub.setFixedHeight(52)
+        sub.setStyleSheet("""
+            QWidget {
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:0,
+                    stop:0 #0a0d16, stop:0.5 #0d0f18, stop:1 #0a0d16);
+                border-bottom: 1px solid #1e2d45;
+            }
+        """)
         sl = QHBoxLayout(sub)
-        sl.setContentsMargins(20, 0, 20, 0)
-        sl.setSpacing(8)
+        sl.setContentsMargins(28, 10, 28, 10)
+        sl.setSpacing(12)
 
-        def _sub_btn(label, color="#94a3b8", bg="#111827", hover="#1e2d45"):
+        def _sub_btn(label, color="#94a3b8", bg="#0e1420", hover="#1a2840", accent=False):
             b = QPushButton(label)
-            b.setFixedHeight(30)
-            b.setStyleSheet(f"""
-                QPushButton {{
-                    background:{bg}; color:{color};
-                    border:1px solid #1e2d45; border-radius:8px;
-                    padding:0 12px; font-size:12px; font-weight:500;
-                }}
-                QPushButton:hover {{ background:{hover}; border-color:#f97316; }}
-            """)
+            b.setFixedHeight(36)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            gradient = f"qlineargradient(x1:0,y1:0,x2:1,y2:1, stop:0 {bg}, stop:1 rgba(0,0,0,0.2))"
+            hover_gradient = f"qlineargradient(x1:0,y1:0,x2:1,y2:1, stop:0 {hover}, stop:1 rgba(0,0,0,0.3))"
+            if accent:
+                b.setStyleSheet(f"""
+                    QPushButton {{
+                        background: {gradient};
+                        color: {color};
+                        border: 2px solid #f97316;
+                        border-radius: 10px;
+                        padding: 0 16px;
+                        font-size: 13px;
+                        font-weight: 600;
+                    }}
+                    QPushButton:hover {{
+                        background: {hover_gradient};
+                        border-color: #fb923c;
+                    }}
+                    QPushButton:pressed {{
+                        background: {hover_gradient};
+                    }}
+                """)
+            else:
+                b.setStyleSheet(f"""
+                    QPushButton {{
+                        background: {gradient};
+                        color: {color};
+                        border: 1px solid #1e2d45;
+                        border-radius: 10px;
+                        padding: 0 16px;
+                        font-size: 13px;
+                        font-weight: 500;
+                    }}
+                    QPushButton:hover {{
+                        background: {hover_gradient};
+                        border-color: #f97316;
+                        color: #f1f5f9;
+                    }}
+                    QPushButton:pressed {{
+                        background: {hover_gradient};
+                    }}
+                """)
             return b
 
-        self.sel_all_btn = _sub_btn("☐  Select All")
+        self.sel_all_btn = _sub_btn("☐  Select All", accent=True)
         self.sel_all_btn.clicked.connect(self._select_all)
 
         self.profile_count_lb = QLabel()
-        self.profile_count_lb.setStyleSheet("color:#334155; font-size:12px; padding:0 8px;")
+        self.profile_count_lb.setStyleSheet("color:#475569; font-size:13px; padding:0 10px; font-weight:500;")
 
         self.open_btn   = _sub_btn("▶  Open",    "#22c55e", "#0a1f13", "#14532d")
-        self.share_btn  = _sub_btn("🔗  Share",   "#94a3b8")
-        self.transfer_btn = _sub_btn("🔄  Transfer","#94a3b8")
         self.delete_btn = _sub_btn("🗑  Delete",  "#f87171", "#1a0a0a", "#450a0a")
+        self.download_btn = _sub_btn("⬇  Download", "#2563EB", "#0c2e5c", "#1e4a8e")
+        self.next_btn = _sub_btn("Next  ▶", "#10b981", "#0a1f13", "#14532d")
 
         self.open_btn.clicked.connect(self._open_selected)
-        self.share_btn.clicked.connect(self._share_selected)
-        self.transfer_btn.clicked.connect(self._transfer_selected)
         self.delete_btn.clicked.connect(self._delete_selected)
+        self.download_btn.clicked.connect(self._download_profiles)
+        self.next_btn.clicked.connect(self._next_page)
 
         sl.addWidget(self.sel_all_btn)
         sl.addWidget(self.profile_count_lb)
         sl.addStretch()
+        sl.addWidget(self.download_btn)
+        sl.addWidget(self.next_btn)
         sl.addWidget(self.open_btn)
-        sl.addWidget(self.share_btn)
-        sl.addWidget(self.transfer_btn)
         sl.addWidget(self.delete_btn)
         lay.addWidget(sub)
 
-        # ── Table ─────────────────────────────────────────────────────────────
+        # ── Table with enhanced styling ────────────────────────────────────────
         COLS = ["", "#", "Profile", "Group", "Browser", "OS",
                 "Proxy", "Fingerprint", "Status", "Last Used", "Actions"]
         self.table = QTableWidget(0, len(COLS))
@@ -460,58 +607,92 @@ class ProfilePanel(QWidget):
         hh.setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
         hh.setSectionResizeMode(self.COL_PROFILE, QHeaderView.ResizeMode.Stretch)
         hh.setSectionResizeMode(self.COL_ACTIONS, QHeaderView.ResizeMode.Fixed)
-        # Total fixed = 1000px; Profile (Stretch) fills the remaining ~220px
-        self.table.setColumnWidth(self.COL_CHK,     38)
-        self.table.setColumnWidth(self.COL_IDX,     42)
-        self.table.setColumnWidth(self.COL_GROUP,   112)
-        self.table.setColumnWidth(self.COL_BROWSER, 105)
-        self.table.setColumnWidth(self.COL_OS,       95)
-        self.table.setColumnWidth(self.COL_PROXY,   118)
-        self.table.setColumnWidth(self.COL_FP,      128)
-        self.table.setColumnWidth(self.COL_STATUS,   98)
-        self.table.setColumnWidth(self.COL_USED,    108)
-        self.table.setColumnWidth(self.COL_ACTIONS, 156)
+        self.table.setColumnWidth(self.COL_CHK,     40)
+        self.table.setColumnWidth(self.COL_IDX,     44)
+        self.table.setColumnWidth(self.COL_GROUP,   120)
+        self.table.setColumnWidth(self.COL_BROWSER, 110)
+        self.table.setColumnWidth(self.COL_OS,      100)
+        self.table.setColumnWidth(self.COL_PROXY,   124)
+        self.table.setColumnWidth(self.COL_FP,      134)
+        self.table.setColumnWidth(self.COL_STATUS,  104)
+        self.table.setColumnWidth(self.COL_USED,    114)
+        self.table.setColumnWidth(self.COL_ACTIONS, 160)
 
         self.table.setStyleSheet("""
             QTableWidget {
-                background: #080c12;
-                alternate-background-color: #0a0f18;
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #05070d, stop:1 #07090f);
+                alternate-background-color: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #0a0d16, stop:1 #0d0f18);
                 border: none;
                 gridline-color: transparent;
-                font-size: 13px;
+                font-size: 14px;
                 color: #e2e8f0;
                 outline: none;
             }
-            QTableWidget::item { padding: 0px; border: none; }
+            QTableWidget::item {
+                padding: 0px;
+                border: none;
+                height: 60px;
+                border-bottom: 1px solid rgba(30, 45, 69, 0.3);
+            }
             QTableWidget::item:selected {
-                background: #1e2d45;
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #1a2840, stop:1 #1f3350);
                 color: #f1f5f9;
             }
             QHeaderView::section {
-                background: #0d1117;
-                color: #475569;
-                font-size: 11px;
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #0a0d16, stop:1 #0d0f18);
+                color: #64748b;
+                font-size: 12px;
                 font-weight: 700;
                 text-transform: uppercase;
-                letter-spacing: 1px;
-                padding: 10px 8px;
+                letter-spacing: 1.3px;
+                padding: 14px 10px;
                 border: none;
-                border-bottom: 2px solid #1a2236;
-                border-right: 1px solid #1a2236;
+                border-bottom: 2px solid;
+                border-image: linear-gradient(90deg, #f97316, #fb923c, #f97316) 0 0 1 0;
+                border-right: 1px solid #1e2d45;
             }
-            QHeaderView::section:hover { color: #f97316; background: #0d1421; }
+            QHeaderView::section:last { border-right: none; }
+            QHeaderView::section:hover { color: #f97316; }
             QScrollBar:vertical {
-                background: #0d1117; width: 6px; border-radius: 3px;
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #07090f, stop:1 #0a0d16);
+                width: 10px;
+                border-radius: 5px;
+                margin: 0;
             }
             QScrollBar::handle:vertical {
-                background: #f97316; border-radius: 3px; min-height: 30px;
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #f97316, stop:1 #fb923c);
+                border-radius: 5px;
+                min-height: 32px;
             }
+            QScrollBar::handle:vertical:hover {
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #fb923c, stop:1 #fbbf24);
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
             QScrollBar:horizontal {
-                background: #0d1117; height: 6px; border-radius: 3px;
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #07090f, stop:1 #0a0d16);
+                height: 10px;
+                border-radius: 5px;
+                margin: 0;
             }
             QScrollBar::handle:horizontal {
-                background: #f97316; border-radius: 3px;
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #f97316, stop:1 #fb923c);
+                border-radius: 5px;
+                min-width: 32px;
             }
+            QScrollBar::handle:horizontal:hover {
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #fb923c, stop:1 #fbbf24);
+            }
+            QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal { width: 0; }
         """)
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
@@ -520,6 +701,7 @@ class ProfilePanel(QWidget):
         self.table.setShowGrid(False)
         self.table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.table.customContextMenuRequested.connect(self._context_menu)
+        self.table.setRowHeight(0, 56)
         lay.addWidget(self.table, 1)
 
     # ── Helpers ───────────────────────────────────────────────────────────────
@@ -544,12 +726,15 @@ class ProfilePanel(QWidget):
         lb.setAlignment(Qt.AlignmentFlag.AlignCenter)
         lb.setStyleSheet(f"""
             QLabel {{
-                color:{fg}; background:{bg};
-                border:1px solid {border};
-                border-radius:6px;
-                padding:2px 8px;
-                font-size:11px;
-                font-weight:600;
+                color: {fg};
+                background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 {bg}, stop:1 rgba(0,0,0,0.2));
+                border: 1px solid {border};
+                border-radius: 8px;
+                padding: 4px 12px;
+                font-size: 12px;
+                font-weight: 700;
+                letter-spacing: 0.2px;
             }}
         """)
         return lb
@@ -576,6 +761,8 @@ class ProfilePanel(QWidget):
         stat_filter = (status.replace("⚡  ","").replace("🟢  ","")
                              .replace("⬜  ","").strip())
 
+        # Collect filtered profiles first
+        filtered_profiles = []
         for i, p in enumerate(self.profiles):
             if filter_text:
                 q = filter_text.lower()
@@ -586,10 +773,18 @@ class ProfilePanel(QWidget):
                 continue
             if stat_filter not in ("All Status", "") and p.status.lower() != stat_filter.lower():
                 continue
+            filtered_profiles.append((i, p))
 
+        # Apply pagination
+        start_idx = self.current_page * self.profiles_per_page
+        end_idx = start_idx + self.profiles_per_page
+        paginated_profiles = filtered_profiles[start_idx:end_idx]
+
+        # Populate table with paginated data
+        for orig_idx, p in paginated_profiles:
             r = self.table.rowCount()
             self.table.insertRow(r)
-            self.table.setRowHeight(r, 58)
+            self.table.setRowHeight(r, 60)
 
             # ── COL 0: Checkbox ───────────────────────────────────────────────
             from PyQt6.QtWidgets import QCheckBox
@@ -599,50 +794,53 @@ class ProfilePanel(QWidget):
             cb_l.setContentsMargins(10, 0, 0, 0)
             cb = QCheckBox()
             cb.setStyleSheet("""
-                QCheckBox::indicator { width:16px; height:16px; border-radius:4px;
+                QCheckBox::indicator { width:18px; height:18px; border-radius:5px;
                     border:2px solid #334155; background:#111827; }
-                QCheckBox::indicator:checked { background:#f97316; border-color:#f97316; }
+                QCheckBox::indicator:checked { background:qlineargradient(x1:0,y1:0,x2:1,y2:1,
+                    stop:0 #f97316, stop:1 #fb923c); border-color:#f97316; }
                 QCheckBox::indicator:hover { border-color:#f97316; }
             """)
+            cb.stateChanged.connect(self._update_select_btn)
             cb_l.addWidget(cb)
             self.table.setCellWidget(r, self.COL_CHK, cb_w)
 
             # ── COL 1: Index ──────────────────────────────────────────────────
-            idx_item = QTableWidgetItem(str(i + 1))
+            idx_item = QTableWidgetItem(str(orig_idx + 1))
             idx_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
             idx_item.setForeground(QColor("#334155"))
             self.table.setItem(r, self.COL_IDX, idx_item)
 
             # ── COL 2: Profile (Avatar + Name + ID) ───────────────────────────
-            ac, ac_bg = self.AVATAR_COLORS[i % len(self.AVATAR_COLORS)]
+            ac, ac_bg = self.AVATAR_COLORS[orig_idx % len(self.AVATAR_COLORS)]
             avatar = QLabel(p.name[0].upper() if p.name else "?")
-            avatar.setFixedSize(36, 36)
+            avatar.setFixedSize(44, 44)
             avatar.setAlignment(Qt.AlignmentFlag.AlignCenter)
             avatar.setStyleSheet(f"""
                 QLabel {{
                     background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
                         stop:0 {ac}, stop:1 {ac_bg});
                     color: white;
-                    border-radius: 10px;
-                    font-size: 15px;
+                    border-radius: 12px;
+                    font-size: 18px;
                     font-weight: 800;
-                    border: none;
+                    border: 2px solid rgba(249,115,22,0.3);
+                    border-radius: 8px;
                 }}
             """)
 
             name_col = QVBoxLayout()
-            name_col.setSpacing(2)
+            name_col.setSpacing(3)
             name_col.setContentsMargins(0, 0, 0, 0)
 
             name_lb = QLabel(p.name)
-            name_lb.setStyleSheet("color:#f1f5f9; font-size:13px; font-weight:700;"
-                                  "background:transparent; border:none;")
+            name_lb.setStyleSheet("color:#f1f5f9; font-size:14px; font-weight:700;"
+                                  "background:transparent; border:none; letter-spacing:0.3px;")
 
             id_row = QHBoxLayout()
             id_row.setSpacing(6)
             id_row.setContentsMargins(0, 0, 0, 0)
             id_lb = QLabel(f"#{p.id}")
-            id_lb.setStyleSheet("color:#334155; font-size:10px; background:transparent; border:none;")
+            id_lb.setStyleSheet("color:#475569; font-size:11px; background:transparent; border:none; font-weight:500;")
             id_row.addWidget(id_lb)
             if p.cloud_synced:
                 sync_lb = QLabel("☁️")
@@ -829,17 +1027,22 @@ class ProfilePanel(QWidget):
 
             def _act_btn(icon, tip, fg, bg, hover_bg):
                 b = QPushButton(icon)
-                b.setFixedSize(32, 32)
+                b.setFixedSize(36, 36)
+                b.setCursor(Qt.CursorShape.PointingHandCursor)
                 b.setToolTip(tip)
                 b.setStyleSheet(f"""
                     QPushButton {{
                         background:{bg}; color:{fg};
-                        border:1px solid {bg}; border-radius:8px;
-                        font-size:13px;
+                        border:1px solid {bg}; border-radius:10px;
+                        font-size:14px; font-weight:500;
+                        padding:0px;
                     }}
                     QPushButton:hover {{
                         background:{hover_bg};
-                        border-color:{fg};
+                        border-color:{hover_bg};
+                    }}
+                    QPushButton:pressed {{
+                        background:{hover_bg};
                     }}
                 """)
                 return b
@@ -868,12 +1071,22 @@ class ProfilePanel(QWidget):
             self.table.setCellWidget(r, self.COL_ACTIONS, acts)
             shown += 1
 
+        total_filtered = len(filtered_profiles)
+        total_pages = (total_filtered + self.profiles_per_page - 1) // self.profiles_per_page if total_filtered > 0 else 1
+        page_info = f"  Page {self.current_page + 1}/{total_pages}  ·  " if total_pages > 1 else "  "
         running = sum(1 for p in self.profiles if p.status == "running")
         self.profile_count_lb.setText(
-            f"  {shown} shown  ·  {running} running  ·  {len(self.profiles)} total"
+            f"{page_info}{shown} shown  ·  {running} running  ·  {len(self.profiles)} total"
         )
+        
+        # Update Next button state (disable on last page)
+        self.next_btn.setEnabled(self.current_page < total_pages - 1 if total_pages > 1 else False)
+        
+        # Reset select all button state after populating
+        self._update_select_btn()
 
     def _filter(self):
+        self.current_page = 0  # Reset to first page when filtering
         self._populate(
             self.search_box.text(),
             self.group_filter.currentText(),
@@ -967,14 +1180,63 @@ class ProfilePanel(QWidget):
         self.mw.statusBar().showMessage(f"✅  Saved: {profile.name}", 3000)
 
     def _select_all(self):
-        for r in range(self.table.rowCount()):
-            cb_w = self.table.cellWidget(r, 0)
+        """Toggle between select all and unselect all based on current state"""
+        from PyQt6.QtWidgets import QCheckBox
+        
+        # Count how many are currently selected
+        selected_count = 0
+        total_count = self.table.rowCount()
+        
+        for r in range(total_count):
+            cb_w = self.table.cellWidget(r, self.COL_CHK)
             if cb_w:
-                for cb in cb_w.findChildren(type(cb_w)):
-                    pass
-                from PyQt6.QtWidgets import QCheckBox
                 for cb in cb_w.findChildren(QCheckBox):
-                    cb.setChecked(True)
+                    if cb.isChecked():
+                        selected_count += 1
+        
+        # If all are selected, unselect all; otherwise select all
+        should_select = selected_count < total_count
+        
+        for r in range(total_count):
+            cb_w = self.table.cellWidget(r, self.COL_CHK)
+            if cb_w:
+                for cb in cb_w.findChildren(QCheckBox):
+                    cb.setChecked(should_select)
+        
+        # Update button label and icon
+        self._update_select_btn()
+
+    def _update_select_btn(self):
+        """Update select button label based on selection state"""
+        from PyQt6.QtWidgets import QCheckBox
+        
+        # Count selected items
+        selected_count = 0
+        total_count = self.table.rowCount()
+        
+        for r in range(total_count):
+            cb_w = self.table.cellWidget(r, self.COL_CHK)
+            if cb_w:
+                for cb in cb_w.findChildren(QCheckBox):
+                    if cb.isChecked():
+                        selected_count += 1
+        
+        # Update button state and label
+        if total_count == 0:
+            self.sel_all_btn.setText("☐  Select All")
+            self.sel_all_btn.setEnabled(False)
+        elif selected_count == total_count:
+            # All selected - show unselect option
+            self.sel_all_btn.setText("☑  Unselect All")
+            self.sel_all_btn.setEnabled(True)
+        elif selected_count > 0:
+            # Some selected - show select remaining
+            self.sel_all_btn.setText(f"☐  Select All ({selected_count}/{total_count})")
+            self.sel_all_btn.setEnabled(True)
+        else:
+            # None selected - show select all
+            self.sel_all_btn.setText("☐  Select All")
+            self.sel_all_btn.setEnabled(True)
 
     def _get_selected(self):
         from PyQt6.QtWidgets import QCheckBox
@@ -999,18 +1261,6 @@ class ProfilePanel(QWidget):
         for p in sel:
             self._toggle_profile(p)
 
-    def _share_selected(self):
-        sel = self._get_selected()
-        dlg = ShareProfileDialog(self, sel, SAMPLE_MEMBERS)
-        if dlg.exec() == QDialog.DialogCode.Accepted:
-            QMessageBox.information(self, "Share", f"✅  Profiles shared successfully.")
-
-    def _transfer_selected(self):
-        sel = self._get_selected()
-        dlg = TransferDialog(self, sel, SAMPLE_MEMBERS)
-        if dlg.exec() == QDialog.DialogCode.Accepted:
-            QMessageBox.information(self, "Transfer", "✅  Profiles transferred.")
-
     def _delete_selected(self):
         sel = self._get_selected()
         if not sel:
@@ -1032,12 +1282,157 @@ class ProfilePanel(QWidget):
             self._save()
             self._filter()
 
+    def _next_page(self):
+        """Navigate to next page of profiles."""
+        self.current_page += 1
+        self._filter()
+
+    def _download_profiles(self):
+        """Export selected profiles (or all) to JSON file."""
+        sel = self._get_selected()
+        if not sel:
+            reply = QMessageBox.question(
+                self, "Download",
+                f"No profiles selected. Download all {len(self.profiles)} profiles?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.No:
+                return
+            sel = self.profiles
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Export Profiles", "profiles.json", "JSON Files (*.json)"
+        )
+        if not file_path:
+            return
+
+        try:
+            import dataclasses
+            export_data = [dataclasses.asdict(p) for p in sel]
+            with open(file_path, "w") as f:
+                json.dump(export_data, f, indent=2, default=str)
+            QMessageBox.information(
+                self, "Success",
+                f"Exported {len(sel)} profile(s) to:\n{file_path}"
+            )
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Export failed: {str(e)}")
+
+    def _show_table_settings(self):
+        """Show workspace table settings dialog."""
+        dlg = QDialog(self)
+        dlg.setWindowTitle("Table Settings")
+        dlg.setFixedSize(400, 280)
+        dlg.setStyleSheet("""
+            QDialog {
+                background: #192134;
+                border: 1px solid rgba(255,255,255,0.08);
+                border-radius: 12px;
+            }
+            QLabel { color: #CBD5E1; }
+            QSpinBox {
+                background: #1E293B;
+                color: #FFFFFF;
+                border: 1px solid rgba(255,255,255,0.08);
+                border-radius: 6px;
+                padding: 6px;
+            }
+            QSpinBox:focus {
+                border: 2px solid #2563EB;
+            }
+            QPushButton {
+                background: #2563EB;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                padding: 8px 20px;
+                font-weight: 600;
+            }
+            QPushButton:hover {
+                background: #1e4a8e;
+            }
+        """)
+
+        lay = QVBoxLayout(dlg)
+        lay.setSpacing(16)
+        lay.setContentsMargins(24, 24, 24, 24)
+
+        # Title
+        title = QLabel("⚙️  Table Settings")
+        title.setStyleSheet("color:#F1F5F9; font-size:16px; font-weight:700;")
+        lay.addWidget(title)
+
+        # Items per page setting
+        items_lay = QHBoxLayout()
+        items_lay.setSpacing(12)
+        items_lbl = QLabel("Profiles per page:")
+        items_lbl.setStyleSheet("color:#CBD5E1; font-size:13px; font-weight:500;")
+        self.items_spinbox = QSpinBox()
+        self.items_spinbox.setMinimum(4)
+        self.items_spinbox.setMaximum(20)
+        self.items_spinbox.setValue(self.profiles_per_page)
+        self.items_spinbox.setFixedWidth(60)
+        items_lay.addWidget(items_lbl)
+        items_lay.addWidget(self.items_spinbox)
+        items_lay.addStretch()
+        lay.addLayout(items_lay)
+
+        # Info text
+        info_lbl = QLabel("✓ Affects pagination starting next filter\n✓ Allows 4-20 profiles per page")
+        info_lbl.setStyleSheet("color:#475569; font-size:11px; font-weight:500;")
+        lay.addWidget(info_lbl)
+
+        lay.addStretch()
+
+        # Buttons
+        btn_lay = QHBoxLayout()
+        btn_lay.setSpacing(12)
+
+        cancel_btn = QPushButton("Cancel")
+        cancel_btn.setStyleSheet("""
+            QPushButton {
+                background: #1E293B;
+                color: #CBD5E1;
+                border: 1px solid rgba(255,255,255,0.08);
+                border-radius: 6px;
+                padding: 8px 20px;
+                font-weight: 600;
+            }
+            QPushButton:hover {
+                background: #334155;
+                color: #F1F5F9;
+            }
+        """)
+        cancel_btn.clicked.connect(dlg.reject)
+
+        apply_btn = QPushButton("✓  Apply")
+        apply_btn.clicked.connect(lambda: self._apply_table_settings(dlg))
+
+        btn_lay.addStretch()
+        btn_lay.addWidget(cancel_btn)
+        btn_lay.addWidget(apply_btn)
+        lay.addLayout(btn_lay)
+
+        dlg.exec()
+
+    def _apply_table_settings(self, dlg):
+        """Apply table settings and refresh view."""
+        new_per_page = self.items_spinbox.value()
+        if new_per_page != self.profiles_per_page:
+            self.profiles_per_page = new_per_page
+            self.current_page = 0
+            self._filter()
+            self.mw.statusBar().showMessage(
+                f"✓ Profiles per page set to {new_per_page}", 3000
+            )
+        dlg.accept()
+
+
+
     def _more_menu(self, profile: BrowserProfile, btn):
         menu = QMenu(self)
         actions = [
             ("📋  Clone Profile",   lambda: self._clone_profile(profile)),
-            ("🔗  Share Profile",   lambda: ShareProfileDialog(self, [profile], SAMPLE_MEMBERS).exec()),
-            ("🔄  Transfer Profile",lambda: TransferDialog(self, [profile], SAMPLE_MEMBERS).exec()),
             ("💾  Export Profile",  lambda pr=profile: self._export_profile(pr)),
             ("♻️  Restore Profile", lambda: QMessageBox.information(self, "Restore", "Profile restored.")),
             (None, None),
@@ -1254,7 +1649,6 @@ class ProfilePanel(QWidget):
              lambda: self._toggle_profile(profile)),
             ("✏️  Edit Profile",   lambda: self._edit_profile(profile)),
             ("📋  Clone Profile",  lambda: self._clone_profile(profile)),
-            ("🔗  Share Profile",  lambda: ShareProfileDialog(self, [profile], SAMPLE_MEMBERS).exec()),
             (None, None),
             ("🗑  Delete",         lambda: self._delete_profile(profile)),
         ]:
@@ -1326,11 +1720,33 @@ class MainWindow(QMainWindow):
 
         self.profile_panel   = ProfilePanel(self)
         self.dashboard_panel = DashboardPanel(self.profile_panel)
-        self.groups_panel    = GroupsPanel(self.profile_panel)
 
         self.stack.addWidget(self.dashboard_panel)   # 0
         self.stack.addWidget(self.profile_panel)     # 1
-        self.stack.addWidget(self.groups_panel)      # 2
+        
+        # Add video creator module
+        try:
+            from video_creator_panel import VideoCreatorPanel
+            self.videocreator_panel = VideoCreatorPanel()
+            self.stack.addWidget(self.videocreator_panel)  # 2
+        except Exception as e:
+            print(f"[WARN] Video Creator Panel failed: {e}")
+            self.videocreator_panel = self._create_placeholder_panel(
+                "🎥 Video Creator", 
+                "Batch-convert images to MP4 videos with background music"
+            )
+            self.stack.addWidget(self.videocreator_panel)  # 2
+        
+        # Add placeholder panels for other tools
+        self.downvideo_panel = self._create_placeholder_panel("🎬 DownVideo Manager", "Download and manage videos")
+        self.fbmanager_panel = self._create_placeholder_panel("👥 FB Manager", "Manage Facebook accounts")
+        self.grokauto_panel = self._create_placeholder_panel("🤖 Grok Auto", "Grok automation tasks")
+        self.flowauto_panel = self._create_placeholder_panel("⚡ Flow Auto", "Flow automation workflows")
+        
+        self.stack.addWidget(self.downvideo_panel)   # 3
+        self.stack.addWidget(self.fbmanager_panel)   # 4
+        self.stack.addWidget(self.grokauto_panel)    # 5
+        self.stack.addWidget(self.flowauto_panel)    # 6
 
         self.stack.setCurrentIndex(1)
         self.sidebar._activate("profiles")
@@ -1340,9 +1756,10 @@ class MainWindow(QMainWindow):
         self.setStatusBar(sb)
         self._update_status()
 
-        timer = QTimer(self)
-        timer.timeout.connect(self._update_status)
-        timer.start(5000)
+        # Store timer as instance variable to prevent garbage collection
+        self.status_timer = QTimer(self)
+        self.status_timer.timeout.connect(self._update_status)
+        self.status_timer.start(5000)
 
     def _nav(self, key):
         if key == "dashboard":
@@ -1350,26 +1767,142 @@ class MainWindow(QMainWindow):
             self.dashboard_panel.refresh()
         elif key == "profiles":
             self.stack.setCurrentIndex(1)
-        elif key == "groups":
+        elif key == "videocreator":
             self.stack.setCurrentIndex(2)
-            self.groups_panel.refresh()
-        elif key == "team":
-            TeamDialog(self).exec()
-            self.sidebar._activate("profiles")
-        elif key == "rpa":
-            RPADialog(self).exec()
-            self.sidebar._activate("profiles")
-        elif key == "api":
-            APIDialog(self).exec()
-            self.sidebar._activate("profiles")
-        elif key == "settings":
-            SettingsDialog(self).exec()
-            self.sidebar._activate("profiles")
+        elif key == "downvideo":
+            self.stack.setCurrentIndex(3)
+        elif key == "fbmanager":
+            self.stack.setCurrentIndex(4)
+        elif key == "grokauto":
+            self.stack.setCurrentIndex(5)
+        elif key == "flowauto":
+            self.stack.setCurrentIndex(6)
+
+    def _create_placeholder_panel(self, title, description):
+        """Create a placeholder panel for future features."""
+        w = QWidget()
+        w.setStyleSheet("background: #0F172A;")
+        lay = QVBoxLayout(w)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.setSpacing(0)
+
+        # Header with title
+        header = QWidget()
+        header.setFixedHeight(80)
+        header.setStyleSheet("""
+            background: qlineargradient(x1:0,y1:0,x2:1,y2:0,
+                stop:0 #0a0d16, stop:0.5 #0f1520, stop:1 #0a0d16);
+            border-bottom: 1px solid #1e2d45;
+        """)
+        h_lay = QHBoxLayout(header)
+        h_lay.setContentsMargins(28, 14, 28, 14)
+
+        title_lbl = QLabel(title)
+        title_lbl.setStyleSheet("""
+            color: #F1F5F9;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        """)
+        h_lay.addWidget(title_lbl)
+        h_lay.addStretch()
+
+        lay.addWidget(header)
+
+        # Content area
+        content = QWidget()
+        content.setStyleSheet("background: #0F172A;")
+        c_lay = QVBoxLayout(content)
+        c_lay.setContentsMargins(40, 40, 40, 40)
+        c_lay.setSpacing(24)
+
+        c_lay.addSpacing(60)
+
+        # Coming soon message
+        icon_lbl = QLabel("🚀")
+        icon_lbl.setStyleSheet("font-size: 48px;")
+        icon_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        c_lay.addWidget(icon_lbl)
+
+        msg_lbl = QLabel(f"{title}\nComing Soon")
+        msg_lbl.setStyleSheet("""
+            color: #CBD5E1;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        """)
+        msg_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        c_lay.addWidget(msg_lbl)
+
+        desc_lbl = QLabel(description)
+        desc_lbl.setStyleSheet("""
+            color: #64748B;
+            font-size: 13px;
+            text-align: center;
+        """)
+        desc_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        c_lay.addWidget(desc_lbl)
+
+        c_lay.addStretch()
+
+        lay.addWidget(content, 1)
+        return w
+
 
     def _update_status(self):
-        running = sum(1 for p in self.profile_panel.profiles if p.status == "running")
-        total = len(self.profile_panel.profiles)
-        self.statusBar().showMessage(
-            f"  🛡️  AntiDetect Browser Manager  |  {total} profiles  |  {running} running  "
-            f"|  Cloud: Connected  |  v2.0.0"
-        )
+        try:
+            # Check if main window is still valid
+            if not self or not hasattr(self, 'statusBar'):
+                return
+            
+            # Check if window is hidden/closing
+            if not self.isVisible():
+                return
+            
+            # Check if profile_panel exists and has profiles
+            if not hasattr(self, 'profile_panel') or not self.profile_panel:
+                return
+            
+            if not hasattr(self.profile_panel, 'profiles'):
+                return
+            
+            running = sum(1 for p in self.profile_panel.profiles if p.status == "running")
+            total = len(self.profile_panel.profiles)
+            
+            # Check if statusBar still exists and is valid
+            try:
+                sb = self.statusBar()
+                if sb is not None and sb.isVisible():
+                    sb.showMessage(
+                        f"  🛡️  KH Browser Manager  |  {total} profiles  |  {running} running  "
+                        f"|  Cloud: Connected  |  v2.0.2.6  |  By SOPHEARUN"
+                    )
+            except RuntimeError:
+                # Status bar was destroyed
+                return
+        except RuntimeError:
+            # Window is being destroyed, stop the timer
+            if hasattr(self, 'status_timer') and self.status_timer and self.status_timer.isActive():
+                self.status_timer.stop()
+        except Exception:
+            # Silently ignore any other errors during shutdown
+            pass
+
+    def closeEvent(self, event):
+        """Clean up resources on window close."""
+        try:
+            # Stop timer immediately before any widget destruction
+            if hasattr(self, 'status_timer') and self.status_timer:
+                self.status_timer.blockSignals(True)
+                self.status_timer.stop()
+        except Exception:
+            pass
+        
+        try:
+            # Disconnect the timer signal to prevent it from firing
+            if hasattr(self, 'status_timer') and self.status_timer:
+                self.status_timer.timeout.disconnect()
+        except Exception:
+            pass
+        
+        super().closeEvent(event)

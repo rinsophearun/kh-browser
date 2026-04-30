@@ -3,21 +3,22 @@
 # Builds for macOS (.app / .dmg) and Windows (.exe)
 
 import sys
+import os
 from PyInstaller.utils.hooks import collect_all
-
-block_cipher = None
 
 # Collect all PyQt6 data / binaries
 datas_qt, binaries_qt, hiddenimports_qt = collect_all('PyQt6')
+
+# Add assets folder
+datas_list = datas_qt + [
+    ('assets', 'assets'),  # Include all assets (icons, images, etc)
+]
 
 a = Analysis(
     ['main.py'],
     pathex=['.'],
     binaries=binaries_qt,
-    datas=datas_qt + [
-        # Include any local resource files here if you add icons/images later
-        # ('assets/*', 'assets'),
-    ],
+    datas=datas_list,
     hiddenimports=hiddenimports_qt + [
         'PyQt6.QtCore',
         'PyQt6.QtGui',
@@ -44,10 +45,13 @@ a = Analysis(
         'batch_dialog',
         'settings_dialog',
         'api_dialog',
+        'assets',
+        'video_creator_qt',
+        'video_creator_panel',
     ],
-    hookspath=[],
+    hookspath=['runtime_hooks'],
     hooksconfig={},
-    runtime_hooks=[],
+    runtime_hooks=['runtime_hooks/hook_pyqt6_fix.py'],
     excludes=[
         'tkinter',
         'matplotlib',
@@ -59,11 +63,10 @@ a = Analysis(
     ],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
-    cipher=block_cipher,
     noarchive=False,
 )
 
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+pyz = PYZ(a.pure, a.zipped_data)
 
 # ─── macOS / Linux: single directory bundle ───────────────────────────────────
 exe = EXE(
@@ -112,4 +115,5 @@ if sys.platform == 'darwin':
             'LSMinimumSystemVersion': '10.15',
             'NSRequiresAquaSystemAppearance': False,
         },
+        entitlements_file='entitlements.plist',
     )

@@ -734,8 +734,8 @@ class TeamDialog(QDialog):
         tbl.setColumnWidth(5, 90)
 
         DEVICES = [
-            ("John Smith",  "MacBook Pro M2",  "macOS 14",   "Today 09:00",      "Active"),
-            ("John Smith",  "Windows Desktop", "Windows 11", "Yesterday 18:00",  "Active"),
+            ("SOPHEARUN",   "MacBook Pro M2",  "macOS 14",   "Today 09:00",      "Active"),
+            ("SOPHEARUN",   "Windows Desktop", "Windows 11", "Yesterday 18:00",  "Active"),
             ("Sarah Lee",   "Dell XPS 15",     "Windows 10", "Today 08:45",      "Active"),
             ("Mike Chen",   "MacBook Air M1",  "macOS 13",   "Yesterday 17:20",  "Active"),
             ("Tom Davis",   "HP EliteBook",    "Windows 11", "3 days ago",       "Inactive"),

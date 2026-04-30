@@ -13,6 +13,10 @@ os.makedirs("assets", exist_ok=True)
 
 # ── Generate base 512x512 PNG via PyQt6 ──────────────────────────────────────
 try:
+    # On headless CI (Windows/Linux) set offscreen platform before QApplication
+    if not os.environ.get("DISPLAY") and sys.platform != "darwin":
+        os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+
     from PyQt6.QtGui import QPixmap, QPainter, QColor, QFont, QBrush, QRadialGradient
     from PyQt6.QtWidgets import QApplication
     from PyQt6.QtCore import Qt

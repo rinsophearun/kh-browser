@@ -1,0 +1,147 @@
+════════════════════════════════════════════════════════════════════════════════
+                        🌌 AURORA UI - DESIGN GUIDE 🌌
+════════════════════════════════════════════════════════════════════════════════
+
+THEME: Aurora Rainbow Glassmorphism
+VERSION: v2.0.2.6
+
+════════════════════════════════════════════════════════════════════════════════
+                            🎨 COLOR PALETTE
+════════════════════════════════════════════════════════════════════════════════
+
+PRIMARY COLORS (Aurora Borealis):
+  • Violet (#7c3aed)      - Primary accent, focus states
+  • Cyan (#06b6d4)        - Secondary accent, hover states  
+  • Pink (#ec4899)        - Tertiary accent, alerts
+  • Indigo (#6366f1)      - Supporting accent
+
+BACKGROUND COLORS:
+  • Deep Space (#0a0e27)   - Main background
+  • Glass Dark (rgba(26,35,68,0.4))  - Frosted glass effect
+  • Glass Medium (rgba(26,35,68,0.6)) - Stronger glass effect
+
+TEXT COLORS:
+  • Light (#e0e7ff)       - Primary text
+  • Medium (#cbd5e1)      - Secondary text
+  • Dim (#a5b4fc)         - Tertiary text
+  • Low (#64748b)         - Disabled/labels
+
+BORDERS & ACCENTS:
+  • Aurora (#7c3aed) with 30-50% opacity
+  • Soft shadows using rgba with transparency
+
+════════════════════════════════════════════════════════════════════════════════
+                        ✨ DESIGN CHARACTERISTICS
+════════════════════════════════════════════════════════════════════════════════
+
+1. GLASSMORPHISM
+   - Background: rgba(26,35,68,0.4) - frosted glass
+   - Borders: rgba(147,112,219,0.3) - soft aurora border
+   - Creates layered, modern aesthetic
+
+2. AURORA GRADIENTS
+   - Scrollbars: Violet → Pink gradient
+   - Progress bars: Cyan → Violet → Pink rainbow
+   - Buttons: Purple or Cyan gradients with aurora colors
+
+3. SMOOTH INTERACTIONS
+   - Hover states: Lighter aurora colors
+   - Focus states: Bright violet borders (2px)
+   - Transitions: Smooth color changes
+
+4. MODERN SPACING
+   - Rounded corners: 8-12px radius
+   - Padding: 8-12px for inputs, 14px for groups
+   - Letter spacing: 1px for labels
+
+════════════════════════════════════════════════════════════════════════════════
+                        🎯 UI ELEMENT STYLING
+════════════════════════════════════════════════════════════════════════════════
+
+INPUTS (QLineEdit, QTextEdit, QSpinBox):
+  • Background: rgba(26,35,68,0.4)
+  • Border: 1px solid rgba(147,112,219,0.3)
+  • Focus: 2px solid #7c3aed with rgba(26,35,68,0.6)
+  • Placeholder: #475569
+
+BUTTONS:
+  • Background: Aurora gradient (Violet → Pink)
+  • Hover: Bright aurora colors
+  • Pressed: Darker aurora tones
+
+TABS:
+  • Active: Violet underline with rgba(124,58,237,0.1) background
+  • Inactive: Transparent with gray text
+  • Hover: Light aurora background
+
+CHECKBOXES & RADIO:
+  • Unchecked: rgba(147,112,219,0.5) border
+  • Checked: Aurora gradient fill (Violet → Pink / Cyan → Violet)
+  • Hover: Brighter violet border
+
+GROUPBOXES:
+  • Background: rgba(26,35,68,0.3)
+  • Border: 1px solid rgba(147,112,219,0.2)
+  • Title color: #7c3aed
+  • Title background: #0a0e27
+
+════════════════════════════════════════════════════════════════════════════════
+                      🌠 INTERACTIVE ELEMENTS
+════════════════════════════════════════════════════════════════════════════════
+
+SCROLLBARS:
+  • Track: rgba(26,35,68,0.3)
+  • Thumb: Cyan → Violet gradient with 0.8 opacity
+  • Creates smooth aurora glow effect
+
+PROGRESS BARS:
+  • Background: rgba(26,35,68,0.4)
+  • Fill: Cyan → Violet → Pink rainbow gradient
+  • Represents aurora borealis movement
+
+DROPDOWNS & MENUS:
+  • Background: rgba(15,23,42,0.9)
+  • Selected items: rgba(124,58,237,0.3)
+  • Borders: Soft aurora colors
+  • Hover: Light aurora highlight
+
+TOOLTIPS:
+  • Background: rgba(26,35,68,0.85)
+  • Border: 1px solid rgba(147,112,219,0.5)
+  • Rounded: 8px border-radius
+
+════════════════════════════════════════════════════════════════════════════════
+                        💫 VISUAL EFFECTS
+════════════════════════════════════════════════════════════════════════════════
+
+SOFT SHADOWS:
+  - Use rgba with transparency instead of hard shadows
+  - Creates dreamy, ethereal appearance
+  - Blends smoothly with background
+
+GRADIENT FLOWS:
+  - Violet (#7c3aed) → Pink (#ec4899) for warmth
+  - Cyan (#06b6d4) → Violet for coolness
+  - Creates natural aurora borealis effect
+
+TRANSPARENCY LAYERS:
+  - 30% opacity: Subtle, background elements
+  - 50% opacity: Medium, interactive elements
+  - 80%+ opacity: Strong, foreground elements
+
+════════════════════════════════════════════════════════════════════════════════
+                          🚀 LAUNCH STATUS
+════════════════════════════════════════════════════════════════════════════════
+
+✅ Aurora UI Theme Applied
+✅ Glassmorphism Effects Enabled
+✅ Rainbow Gradients Integrated
+✅ Modern Typography
+✅ Smooth Interactions
+✅ Cross-Platform Compatible
+
+The KH Browser now features a stunning Aurora UI with modern glassmorphism
+design, creating an ethereal and professional appearance with aurora borealis
+inspired colors.
+
+════════════════════════════════════════════════════════════════════════════════

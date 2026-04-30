@@ -7,6 +7,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, pyqtProperty
 from PyQt6.QtGui import QFont, QColor, QPainter, QLinearGradient, QBrush, QPen
 import datetime
+from assets import get_asset_path
 
 # ── Palette ────────────────────────────────────────────────────────────────────
 BG_DEEP   = "#080c12"
@@ -521,7 +522,7 @@ class QuickInfoStrip(QFrame):
             ("time",    "🕐", "00:00:00"),
             ("uptime",  "⏱️", "Uptime: 0s"),
             ("date",    "📅", ""),
-            ("version", "🛡️", "v2.0.0"),
+            ("version", "🛡️", "v2.0.2.6"),
         ]:
             lbl = QLabel(f" {icon} {default} ")
             lbl.setStyleSheet(f"color:{TEXT_MID};font-size:12px;background:transparent;border:none;")
@@ -579,13 +580,24 @@ class DashboardPanel(QWidget):
         hl.setContentsMargins(28, 0, 28, 0)
 
         logo = QLabel("📊")
-        logo.setStyleSheet(f"""
-            font-size:24px;
-            background:{ORANGE_DIM}80;
-            border-radius:10px;
-            padding:4px 8px;
-            border:1px solid {ORANGE}40;
-        """)
+        logo_img = QLabel()
+        from PyQt6.QtGui import QPixmap
+        logo_path = get_asset_path("Logo.png")
+        logo_pixmap = QPixmap(logo_path) if logo_path else QPixmap()
+        if not logo_pixmap.isNull():
+            scaled_logo = logo_pixmap.scaledToHeight(56)
+            logo_img.setPixmap(scaled_logo)
+            logo_img.setStyleSheet("background:transparent;border:none;padding:0;margin:0;")
+            hl.addWidget(logo_img)
+        else:
+            logo.setStyleSheet(f"""
+                font-size:24px;
+                background:{ORANGE_DIM}80;
+                border-radius:10px;
+                padding:4px 8px;
+                border:1px solid {ORANGE}40;
+            """)
+            hl.addWidget(logo)
 
         title_col = QVBoxLayout()
         title_col.setSpacing(1)
@@ -604,7 +616,6 @@ class DashboardPanel(QWidget):
             border:1px solid {ORANGE}30;
         """)
 
-        hl.addWidget(logo)
         hl.addSpacing(12)
         hl.addLayout(title_col)
         hl.addStretch()

@@ -100,6 +100,65 @@ class BrowserProfile:
     cloud_synced: bool = False
     startup_url: str = ""
 
+    def validate(self) -> tuple[bool, str]:
+        """Validate profile with rules. Returns (is_valid, error_message)"""
+        # Rule 1: Name is required and 2-100 characters
+        if not self.name or not self.name.strip():
+            return False, "Profile name is required"
+        if len(self.name) < 2:
+            return False, "Profile name must be at least 2 characters"
+        if len(self.name) > 100:
+            return False, "Profile name must be less than 100 characters"
+        
+        # Rule 2: Group is required and 1-50 characters
+        if not self.group or not self.group.strip():
+            return False, "Group name is required"
+        if len(self.group) > 50:
+            return False, "Group name must be less than 50 characters"
+        
+        # Rule 3: Browser type must be valid
+        valid_browsers = ["Chrome", "Firefox", "Edge", "Safari", "Brave", "Opera"]
+        if self.browser_type not in valid_browsers:
+            return False, f"Invalid browser type. Must be one of: {', '.join(valid_browsers)}"
+        
+        # Rule 4: OS type must be valid
+        valid_os = ["Windows", "macOS", "Linux", "Android", "iOS"]
+        if self.os_type not in valid_os:
+            return False, f"Invalid OS type. Must be one of: {', '.join(valid_os)}"
+        
+        # Rule 5: Status must be valid
+        valid_status = ["running", "stopped", "loading"]
+        if self.status not in valid_status:
+            return False, f"Invalid status. Must be one of: {', '.join(valid_status)}"
+        
+        # Rule 6: Tags limit (max 10 tags)
+        if len(self.tags) > 10:
+            return False, "Maximum 10 tags allowed per profile"
+        
+        # Rule 7: Tag length validation (each 1-30 characters)
+        for tag in self.tags:
+            if not tag or len(tag) > 30:
+                return False, "Each tag must be 1-30 characters"
+        
+        # Rule 8: Notes length limit (max 1000 characters)
+        if len(self.notes) > 1000:
+            return False, "Notes must be less than 1000 characters"
+        
+        # Rule 9: Accounts limit (max 50)
+        if len(self.accounts) > 50:
+            return False, "Maximum 50 platform accounts per profile"
+        
+        # Rule 10: Extensions limit (max 30)
+        if len(self.extensions) > 30:
+            return False, "Maximum 30 extensions per profile"
+        
+        # Rule 11: Startup URL validation
+        if self.startup_url:
+            if not self.startup_url.startswith(("http://", "https://", "about:", "chrome:")):
+                return False, "Invalid startup URL. Must start with http://, https://, about:, or chrome:"
+        
+        return True, ""
+
 
 @dataclass
 class TeamMember:
@@ -172,7 +231,7 @@ SAMPLE_PROFILES = [
 ]
 
 SAMPLE_MEMBERS = [
-    TeamMember(name="John Smith", email="john@company.com", role="Owner",
+    TeamMember(name="SOPHEARUN", email="sophearun@khbrowser.com", role="Creator",
                status="Active", max_profiles=1000, max_devices=10, joined_at="2023-06-01",
                last_login="2024-01-15 09:00", shared_profiles=120),
     TeamMember(name="Sarah Lee", email="sarah@company.com", role="Admin",

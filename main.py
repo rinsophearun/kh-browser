@@ -1,12 +1,12 @@
 """Entry point for KH Browser."""
 import sys
-from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 
 
 def main():
     # Must set BEFORE QApplication is created
+    from PyQt6.QtWidgets import QApplication
     QApplication.setHighDpiScaleFactorRoundingPolicy(
         Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
     )
@@ -19,8 +19,8 @@ def main():
     from main_window import MainWindow
     window = MainWindow()
     window.show()
-    sys.exit(app.exec())
+    return app.exec()
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

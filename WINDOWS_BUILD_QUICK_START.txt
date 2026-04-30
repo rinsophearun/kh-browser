@@ -1,0 +1,128 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║            KH BROWSER v2.0.0 - WINDOWS BUILD QUICK START                 ║
+║                                                                           ║
+║  This document provides instructions to build KH Browser as a Windows    ║
+║  .exe installer on a Windows machine.                                     ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+PLATFORM REQUIREMENTS:
+═════════════════════════════════════════════════════════════════════════════
+✓ Windows 10/11 (64-bit recommended)
+✓ Python 3.11 or higher
+✓ Inno Setup 6 (free, download from https://jrsoftware.org/isdl.php)
+
+STEP 1: PREPARE YOUR WINDOWS MACHINE
+═════════════════════════════════════════════════════════════════════════════
+
+1. Download and install Python 3.11+ from https://www.python.org/downloads/
+   ➜ IMPORTANT: Check "Add Python to PATH" during installation
+
+2. Download and install Inno Setup 6:
+   ➜ https://jrsoftware.org/isdl.php
+   ➜ Run the installer with default settings
+
+3. Copy the entire KH Browser project folder to your Windows machine
+   ➜ e.g., C:\Users\YourName\Projects\KH browser\
+
+
+STEP 2: OPEN POWERSHELL AS ADMINISTRATOR
+═════════════════════════════════════════════════════════════════════════════
+
+1. Press Win+X, then select "Windows PowerShell (Admin)"
+2. Navigate to the project folder:
+   PS> cd "C:\Users\YourName\Projects\KH browser"
+
+3. Copy this complete command and paste it:
+
+   ───────────────────────────────────────────────────────────────────────
+   python -m venv venv; .\venv\Scripts\Activate; pip install -r requirements.txt; python build_windows_complete.py
+   ───────────────────────────────────────────────────────────────────────
+
+4. Press Enter and wait for the build to complete (10-15 minutes)
+
+
+EXPECTED BUILD OUTPUT:
+═════════════════════════════════════════════════════════════════════════════
+
+Phase 1: ✅ Verify Project Structure
+Phase 2: ✅ Generate Application Icons  
+Phase 3: ✅ Install Dependencies
+Phase 4: ✅ Clean Previous Builds
+Phase 5: ✅ Build Windows EXE (PyInstaller)
+Phase 6: ✅ Create Windows Installer Setup (Inno Setup)
+Phase 7: ✅ Final Verification
+
+✓ dist\KHBrowser\KHBrowser.exe       (~380 MB - Portable executable)
+✓ installer_output\KHBrowser-Setup.exe (~95 MB - Setup installer wizard)
+
+
+DISTRIBUTION OPTIONS:
+═════════════════════════════════════════════════════════════════════════════
+
+Option 1: PORTABLE (no installation required)
+  File: dist\KHBrowser\KHBrowser.exe
+  Size: ~380 MB
+  Usage: Users double-click to run immediately
+  Pros: No installer needed, works on any Windows machine
+  Cons: Larger file size
+
+Option 2: INSTALLER (traditional setup)
+  File: installer_output\KHBrowser-Setup.exe
+  Size: ~95 MB
+  Usage: Users run installer, adds Start menu shortcut
+  Pros: Standard Windows installation, smaller download
+  Cons: Requires installation step
+
+
+TESTING ON WINDOWS:
+═════════════════════════════════════════════════════════════════════════════
+
+After build completes:
+
+1. Test the portable EXE:
+   Double-click: dist\KHBrowser\KHBrowser.exe
+   ➜ App should launch with all features available
+
+2. Test the installer:
+   Double-click: installer_output\KHBrowser-Setup.exe
+   ➜ Follow installer wizard
+   ➜ App should appear in Windows Start menu
+
+
+TROUBLESHOOTING:
+═════════════════════════════════════════════════════════════════════════════
+
+Issue: "Python not found"
+→ Ensure Python is added to PATH (reinstall and check option)
+
+Issue: "PyInstaller not installed"
+→ Rerun: pip install PyInstaller
+
+Issue: "Inno Setup not found"
+→ Download from https://jrsoftware.org/isdl.php and install
+
+Issue: Build hangs
+→ Press Ctrl+C and retry with: python build_windows_complete.py
+
+
+FINAL STEPS:
+═════════════════════════════════════════════════════════════════════════════
+
+After successful build:
+
+✅ Test both .exe files thoroughly on Windows
+✅ Share the installer .exe with end users
+✅ Upload portable .exe to your release page/website
+✅ Document system requirements (Windows 10/11, 64-bit)
+
+
+VERSION INFORMATION:
+═════════════════════════════════════════════════════════════════════════════
+Application: KH Browser
+Version: 2.0.0
+Built: 2026-04-30
+Python: 3.11+
+PyQt6: Latest
+PyInstaller: Latest
+
+═══════════════════════════════════════════════════════════════════════════

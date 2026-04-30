@@ -1,0 +1,246 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║    KH BROWSER v2.0.0 - WINDOWS BUILD & INSTALL COMPLETE CHECKLIST       ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+BEFORE STARTING:
+═════════════════════════════════════════════════════════════════════════════
+[ ] Windows 10 or Windows 11 machine
+[ ] Administrator access
+[ ] 5+ GB free disk space
+[ ] Stable internet connection (for downloading dependencies)
+[ ] This entire WINDOWS_BUILD_PACKAGE folder copied to Windows
+
+
+PREREQUISITES INSTALLATION:
+═════════════════════════════════════════════════════════════════════════════
+
+STEP 1: Install Python 3.11+
+────────────────────────────
+[ ] Download Python from: https://www.python.org/downloads/
+[ ] Run installer
+[ ] ⚠️  CHECK: "Add Python to PATH"
+[ ] Click "Install Now"
+[ ] Wait for installation to complete (~3 minutes)
+[ ] Verify: Open CMD, type: python --version
+    Expected: Python 3.11.x or higher
+
+
+STEP 2: Install Inno Setup 6 (FREE)
+────────────────────────────────────
+[ ] Download from: https://jrsoftware.org/isdl.php
+[ ] Look for: "inno-6.x.x.exe" (about 5 MB)
+[ ] Run installer
+[ ] Click "Next" through default settings
+[ ] Click "Install"
+[ ] Click "Finish"
+[ ] Wait for installation to complete (~2 minutes)
+[ ] Verify: Check if installed to:
+    C:\Program Files (x86)\Inno Setup 6\
+
+
+BUILD PROCESS:
+═════════════════════════════════════════════════════════════════════════════
+
+STEP 3: Run Build Script (Choose One)
+─────────────────────────────────────
+
+Option A: CMD/Command Prompt (Easiest)
+[ ] Navigate to this folder in Windows Explorer
+[ ] Hold Shift, right-click empty space
+[ ] Select "Open command window here" (or "Open PowerShell window here")
+[ ] Type: BUILD.bat
+[ ] Press Enter
+[ ] Wait 15-20 minutes for build to complete
+
+
+Option B: PowerShell
+[ ] Right-click desktop
+[ ] Select "Windows PowerShell (Admin)"
+[ ] Navigate: cd C:\Path\To\KH browser
+[ ] Type: powershell -ExecutionPolicy Bypass -File BUILD.ps1
+[ ] Press Enter
+[ ] Wait 15-20 minutes for build to complete
+
+
+Option C: Manual Command
+[ ] Open PowerShell as Administrator
+[ ] Copy and paste this entire command:
+   
+   python -m venv venv; .\venv\Scripts\Activate; pip install -r requirements.txt; python build_windows_complete.py
+   
+[ ] Press Enter
+[ ] Wait 15-20 minutes for completion
+
+
+DURING BUILD:
+═════════════════════════════════════════════════════════════════════════════
+[ ] Monitor the console output
+[ ] Do NOT close the window
+[ ] Do NOT interrupt (even if it seems slow)
+[ ] First build takes 10-15 minutes
+[ ] Watch for these phases:
+    [ ] ✓ Phase 1: Verify Project Structure
+    [ ] ✓ Phase 2: Generate Icons
+    [ ] ✓ Phase 3: Install Dependencies (3-5 min)
+    [ ] ✓ Phase 4: Clean Previous Builds
+    [ ] ✓ Phase 5: Build Windows EXE (5-10 min, longest)
+    [ ] ✓ Phase 6: Create Setup Installer (2-5 min)
+    [ ] ✓ Phase 7: Final Verification
+
+
+AFTER BUILD COMPLETES:
+═════════════════════════════════════════════════════════════════════════════
+
+SUCCESS CHECK:
+[ ] Console shows: "✅ BUILD SUCCESSFUL"
+[ ] No "Error" or "Failed" messages
+[ ] File check: dist\KHBrowser\KHBrowser.exe exists
+[ ] Size check: ~380 MB
+[ ] File check: installer_output\KHBrowser-2.0.0-Setup-Windows.exe exists
+[ ] Size check: ~95 MB
+
+
+VERIFY ICONS ARE EMBEDDED:
+═════════════════════════════════════════════════════════════════════════════
+[ ] Right-click: dist\KHBrowser\KHBrowser.exe
+[ ] Select: "Properties"
+[ ] Check: Icon shows KH Browser logo (not generic executable icon)
+[ ] Repeat for: installer_output\*.exe
+
+
+TEST PORTABLE VERSION:
+═════════════════════════════════════════════════════════════════════════════
+[ ] Double-click: dist\KHBrowser\KHBrowser.exe
+[ ] Wait for: Splash screen appears
+[ ] Wait for: Main window fully loads (~5 seconds)
+[ ] Verify: Window title shows "KH Browser"
+[ ] Check: Profiles panel is visible
+[ ] Check: All buttons appear:
+    [ ] ✨ New Profile
+    [ ] ⚡ Batch
+    [ ] 🔄 Update
+    [ ] 🟢 Open All
+    [ ] 🟠 Close All
+    [ ] 💝 Donate
+[ ] Click: "Donate" button → QR popup appears
+[ ] Click: Close button on QR popup
+[ ] Click: Settings/gear icon on profile (if profile exists)
+[ ] Verify: Settings tab opens with 7 options
+[ ] Close application cleanly
+[ ] Verify: No errors in console
+
+
+TEST INSTALLER VERSION:
+═════════════════════════════════════════════════════════════════════════════
+[ ] Double-click: installer_output\KHBrowser-2.0.0-Setup-Windows.exe
+[ ] Wait for: Setup wizard appears
+[ ] Select: "I accept the license agreement"
+[ ] Click: "Next"
+[ ] Choose: Installation folder (default is fine)
+[ ] Click: "Next"
+[ ] Select: "Create a desktop shortcut" (optional)
+[ ] Click: "Install"
+[ ] Wait for: Installation to complete (~1-2 minutes)
+[ ] Check: "Launch KH Browser" is checked
+[ ] Click: "Finish"
+[ ] Wait for: Application launches
+[ ] Verify: Same UI and features as portable version
+[ ] Close application
+[ ] Check: Windows Start menu has "KH Browser" shortcut
+[ ] Click: Start menu shortcut to verify it works
+
+
+NO ERROR VERIFICATION:
+═════════════════════════════════════════════════════════════════════════════
+[ ] Build output: No "error" messages
+[ ] Build output: No "failed" messages
+[ ] Build output: No "missing file" messages
+[ ] Build output: No "access denied" messages
+[ ] Application launch: No crash dialogs
+[ ] Application launch: No error popups
+[ ] Icons: Visible and correct on both .exe files
+[ ] All features: All buttons functional
+[ ] No warnings: In console during build
+
+
+READY FOR DISTRIBUTION:
+═════════════════════════════════════════════════════════════════════════════
+
+Both files are complete with:
+[ ] ✓ Icons embedded
+[ ] ✓ All source code bundled
+[ ] ✓ All dependencies included
+[ ] ✓ All assets (QR code, icons) included
+[ ] ✓ Full functionality verified
+[ ] ✓ No runtime errors
+[ ] ✓ Ready for Windows 10/11
+
+
+DISTRIBUTION OPTIONS:
+═════════════════════════════════════════════════════════════════════════════
+
+Option 1: GitHub Releases (Recommended)
+[ ] Go to: https://github.com/rinsophearun/kh-browser/releases
+[ ] Click: "Draft a new release"
+[ ] Tag version: v2.0.0
+[ ] Title: "KH Browser v2.0.0 - Full Release"
+[ ] Description: Add your release notes
+[ ] Upload files:
+    [ ] dist\KHBrowser\KHBrowser.exe
+    [ ] installer_output\KHBrowser-2.0.0-Setup-Windows.exe
+[ ] Click: "Publish release"
+[ ] Share link with users
+
+
+Option 2: Website/Downloads Page
+[ ] Upload both .exe files
+[ ] Add system requirements
+[ ] Add installation instructions
+[ ] Test download links
+
+
+Option 3: Direct Sharing
+[ ] Email portable .exe to users
+[ ] Cloud storage (Google Drive, OneDrive, Dropbox)
+[ ] File sharing service
+
+
+SHARE WITH USERS:
+═════════════════════════════════════════════════════════════════════════════
+
+Recommended file: installer_output\KHBrowser-2.0.0-Setup-Windows.exe
+
+Include instructions:
+[ ] Windows 10/11 64-bit required
+[ ] Double-click to run installer
+[ ] Follow wizard steps
+[ ] Click "Finish" to launch
+[ ] All features included and ready to use
+
+
+MAINTENANCE:
+═════════════════════════════════════════════════════════════════════════════
+
+For future builds:
+[ ] Keep WINDOWS_BUILD_PACKAGE folder
+[ ] Just run: BUILD.bat or BUILD.ps1 again
+[ ] Build takes 10-15 minutes each time
+[ ] Outputs are automatically cleaned and regenerated
+[ ] No need to reinstall Python or Inno Setup
+
+
+FINAL SIGN-OFF:
+═════════════════════════════════════════════════════════════════════════════
+
+✅ All prerequisites installed
+✅ Build completed with no errors
+✅ Both .exe files created with icons
+✅ Portable version tested and working
+✅ Installer version tested and working
+✅ All features verified functional
+✅ Ready for distribution to users
+
+
+═══════════════════════════════════════════════════════════════════════════
+KH Browser v2.0.0 - Windows Build Complete and Ready for Release!
+═══════════════════════════════════════════════════════════════════════════

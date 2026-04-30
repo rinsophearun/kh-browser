@@ -11,9 +11,9 @@
 
 #define AppName      "KH Browser"
 #define AppExeName   "KHBrowser.exe"
-#define AppVersion   "1.0.0"
+#define AppVersion   "2.0.26"
 #define AppPublisher "KH Browser Team"
-#define AppURL       "https://github.com/your-org/kh-browser"
+#define AppURL       "https://github.com/rinsophearun/kh-browser"
 #define AppID        "{{B7C3A1D0-9F4E-4B2A-8C6D-1E5F3A2B0D9C}"
 
 [Setup]

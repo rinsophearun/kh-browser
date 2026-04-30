@@ -108,8 +108,8 @@ if sys.platform == 'darwin':
         info_plist={
             'NSPrincipalClass': 'NSApplication',
             'NSHighResolutionCapable': True,
-            'CFBundleShortVersionString': '1.0.0',
-            'CFBundleVersion': '1.0.0',
+            'CFBundleShortVersionString': '2.0.26',
+            'CFBundleVersion': '2.0.26',
             'CFBundleName': 'KH Browser',
             'CFBundleDisplayName': 'KH Browser',
             'LSMinimumSystemVersion': '10.15',

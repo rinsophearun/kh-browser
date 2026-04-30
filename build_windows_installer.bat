@@ -1,19 +1,20 @@
 @echo off
 REM ═══════════════════════════════════════════════════════════════════════════
 REM  build_windows_installer.bat
-REM  One-click: Python deps → PyInstaller EXE → Inno Setup installer
-REM  Run this on Windows 10 / 11 with Python 3.10+ installed
+REM  KH Browser v2.0.0 - One-click Windows Installer Builder
+REM  Python deps → PyInstaller EXE → Inno Setup installer
+REM  Run this on Windows 10/11 with Python 3.11+ installed
 REM ═══════════════════════════════════════════════════════════════════════════
 
 setlocal EnableDelayedExpansion
 set APP_NAME=KHBrowser
-set VERSION=1.0.0
+set VERSION=2.0.0
 set INNO_DEFAULT=C:\Program Files (x86)\Inno Setup 6\ISCC.exe
 
 echo.
 echo  ╔═══════════════════════════════════════════════════════════════╗
-echo  ║   ANTIDETECT BROWSER — Windows 11 Installer Builder          ║
-echo  ║   Version %VERSION%                                           ║
+echo  ║   KH BROWSER v%VERSION% — Windows Installer Builder             ║
+echo  ║   Portable EXE + Setup Wizard                                 ║
 echo  ╚═══════════════════════════════════════════════════════════════╝
 echo.
 
@@ -34,7 +35,7 @@ echo  ✓ Python %PY_VER% found
 REM ── Step 2: Install dependencies ─────────────────────────────────────────
 echo.
 echo [2/5] Installing Python dependencies...
-pip install PyQt6 pyinstaller requests cryptography Pillow --quiet
+pip install PyQt6 PyInstaller requests cryptography Pillow --quiet
 if errorlevel 1 (
     echo  ERROR: pip install failed!
     pause & exit /b 1
@@ -43,13 +44,14 @@ echo  ✓ Dependencies installed
 
 REM ── Step 3: Generate icons ────────────────────────────────────────────────
 echo.
-echo [3/5] Generating icons...
-if not exist "assets\" mkdir assets
-python build_icons.py
-if errorlevel 1 (
-    echo  WARNING: Icon generation had issues, using fallback...
+echo [3/5] Verifying icons and assets...
+if not exist "assets\icon.ico" (
+    echo  WARNING: assets\icon.ico not found
 )
-echo  ✓ Icons ready
+if not exist "qr\qr.jpg" (
+    echo  WARNING: qr\qr.jpg not found
+)
+echo  ✓ Assets verified
 
 REM ── Step 4: Build .exe with PyInstaller ──────────────────────────────────
 echo.
@@ -135,16 +137,25 @@ if errorlevel 1 (
 REM ── Done ─────────────────────────────────────────────────────────────────
 echo.
 echo  ╔═══════════════════════════════════════════════════════════════╗
-echo  ║   BUILD COMPLETE!                                             ║
+echo  ║   BUILD COMPLETE — KH Browser v%VERSION%                        ║
 echo  ╠═══════════════════════════════════════════════════════════════╣
 echo  ║                                                               ║
-echo  ║   📦 Portable EXE:                                           ║
-echo  ║      dist\%APP_NAME%.exe                        ║
+echo  ║   📦 Portable EXE (~380 MB):                                 ║
+echo  ║      dist\%APP_NAME%\%APP_NAME%.exe                          ║
+echo  ║      (No installation required - run directly)               ║
 echo  ║                                                               ║
-echo  ║   🪟 Windows Installer:                                      ║
-echo  ║      installer_output\KHBrowser-%VERSION%-Setup.exe   ║
+echo  ║   🪟 Windows Installer (~95 MB):                             ║
+echo  ║      installer_output\%APP_NAME%-%VERSION%-Setup.exe         ║
+echo  ║      (Setup wizard for traditional installation)             ║
 echo  ║                                                               ║
-echo  ║   ✅ Share the Setup.exe with your users                     ║
+echo  ║   ✨ Features Included:                                       ║
+echo  ║      • Open All / Close All buttons                          ║
+echo  ║      • Donate button with QR code                            ║
+echo  ║      • Update button                                         ║
+echo  ║      • Settings tab (7 options)                              ║
+echo  ║      • Real-time auto-refresh                                ║
+echo  ║                                                               ║
+echo  ║   ✅ Both files ready for distribution to users!             ║
 echo  ╚═══════════════════════════════════════════════════════════════╝
 echo.
 

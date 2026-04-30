@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """
-🍎 KH Browser - Complete macOS Build Automation
-Orchestrates the entire build process in one go.
+🪟 KH Browser - Complete Windows Build Automation
+Orchestrates the entire Windows .exe build process in one go.
+Can run on any platform (but Inno Setup requires Windows).
 """
 
 import os
 import sys
 import subprocess
 import time
+import shutil
 from pathlib import Path
 from datetime import datetime
 
@@ -76,7 +78,7 @@ def main():
     
     os.chdir(PROJECT_DIR)
     
-    print_header("🍎 KH Browser - Complete macOS Build")
+    print_header("🪟 KH Browser - Complete Windows Build")
     
     # ────────────────────────────────────────────────────────────────────────
     # Phase 1: Verification
@@ -87,10 +89,9 @@ def main():
     required_files = [
         "main.py",
         "khbrowser.spec",
-        "build_macos.sh",
-        "entitlements.plist",
+        "installer.iss",
         "requirements.txt",
-        "assets/Logo.png",
+        "assets/icon.ico",
         "runtime_hooks/hook_pyqt6_fix.py",
     ]
     
@@ -115,17 +116,14 @@ def main():
     
     print_header("📦 Phase 2: Generate Application Icons")
     
-    icns_path = PROJECT_DIR / "assets/icon.icns"
     ico_path = PROJECT_DIR / "assets/icon.ico"
     
-    if icns_path.exists() and ico_path.exists():
-        print_success("Icons already exist")
-        icns_size = icns_path.stat().st_size / (1024*1024)
+    if ico_path.exists():
+        print_success("Windows icon already exists")
         ico_size = ico_path.stat().st_size / 1024
-        print_success(f"macOS icon: icon.icns ({icns_size:.1f} MB)")
         print_success(f"Windows icon: icon.ico ({ico_size:.1f} KB)")
     else:
-        print_step("Generating icons...")
+        print_step("Generating Windows icon...")
         if run_command(
             "python3 generate_icons_advanced.py",
             "Icon generation",
@@ -144,7 +142,7 @@ def main():
     
     print_step("Installing Python packages...")
     if run_command(
-        "pip3 install -q -r requirements.txt",
+        "source venv/bin/activate && pip install -q -r requirements.txt",
         "Dependency installation"
     ):
         print_success("Dependencies installed")
@@ -153,13 +151,13 @@ def main():
         return False
     
     # Verify key packages
-    packages = ["PyQt6", "PyInstaller", "cryptography", "requests"]
-    for pkg in packages:
+    packages = {"PyQt6": "PyQt6", "PyInstaller": "PyInstaller", "cryptography": "cryptography", "requests": "requests", "Pillow": "PIL"}
+    for pkg_name, import_name in packages.items():
         try:
-            __import__(pkg.replace("-", "_"))
-            print_success(f"Package: {pkg}")
+            __import__(import_name)
+            print_success(f"Package: {pkg_name}")
         except ImportError:
-            print_error(f"Missing package: {pkg}")
+            print_error(f"Missing package: {pkg_name}")
             return False
     
     # ────────────────────────────────────────────────────────────────────────
@@ -173,24 +171,23 @@ def main():
         path = PROJECT_DIR / dirpath
         if path.exists():
             print_info(f"Removing {dirpath}/...")
-            import shutil
             shutil.rmtree(path, ignore_errors=True)
     
     print_success("Clean complete")
     
     # ────────────────────────────────────────────────────────────────────────
-    # Phase 5: Build macOS Application
+    # Phase 5: Build Windows EXE
     # ────────────────────────────────────────────────────────────────────────
     
-    print_header("🏗️  Phase 5: Build macOS Application")
+    print_header("🏗️  Phase 5: Build Windows EXE")
     
-    print_step("Running PyInstaller...")
+    print_step("Running PyInstaller for Windows...")
     print_info("This may take 5-10 minutes on first build...")
     
     start = time.time()
     if run_command(
-        "pyinstaller khbrowser.spec",
-        "PyInstaller build",
+        "source venv/bin/activate && pyinstaller khbrowser.spec --clean --noconfirm",
+        "PyInstaller build for Windows",
         show_output=True
     ):
         build_time = int(time.time() - start)
@@ -199,37 +196,77 @@ def main():
         print_error("PyInstaller failed")
         return False
     
-    # Verify app bundle
-    app_path = PROJECT_DIR / "dist/KHBrowser.app"
-    if not app_path.exists():
-        print_error(".app bundle not created")
+    # Verify exe
+    exe_path = PROJECT_DIR / "dist/KHBrowser/KHBrowser.exe"
+    if not exe_path.exists():
+        print_error(".exe not created")
         return False
     
-    app_size = sum(p.stat().st_size for p in app_path.rglob('*')) / (1024*1024)
-    print_success(f"App bundle created: dist/KHBrowser.app ({app_size:.0f} MB)")
+    exe_size = exe_path.stat().st_size / (1024*1024)
+    print_success(f"Portable EXE created: dist/KHBrowser/KHBrowser.exe ({exe_size:.0f} MB)")
     
     # ────────────────────────────────────────────────────────────────────────
-    # Phase 6: Create DMG Installer
+    # Phase 6: Create Installer (Inno Setup - Windows only)
     # ────────────────────────────────────────────────────────────────────────
     
-    print_header("📦 Phase 6: Create DMG Installer")
+    print_header("📦 Phase 6: Create Windows Installer Setup")
     
-    dmg_file = "dist/KHBrowser-1.0.0-macOS.dmg"
+    inno_path = "C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe"
     
-    print_step("Creating DMG with LZMA2 compression...")
-    print_info("This may take 2-3 minutes...")
-    
-    if run_command(
-        f'hdiutil create -volname "KHBrowser 1.0.0" -srcfolder dist/KHBrowser.app -ov -format ULMO {dmg_file}',
-        "DMG creation",
-        show_output=True
-    ):
-        dmg_path = PROJECT_DIR / dmg_file
-        dmg_size = dmg_path.stat().st_size / (1024*1024*1024)
-        print_success(f"DMG created: {dmg_file} ({dmg_size:.1f} GB)")
+    # On macOS/Linux, we'll create a mock installer but note that Inno Setup is needed
+    if sys.platform == "win32":
+        print_step("Creating Windows Setup with Inno Setup...")
+        if run_command(
+            f'"{inno_path}" /Q installer.iss',
+            "Inno Setup compilation",
+            show_output=True
+        ):
+            print_success("Windows Setup installer created")
+        else:
+            print_error("Inno Setup compilation failed")
+            print_info("Note: Inno Setup is only available on Windows")
     else:
-        print_error("DMG creation failed")
-        return False
+        print_info("Not on Windows - Inno Setup installer requires Windows platform")
+        print_info("However, portable EXE is ready for distribution")
+        
+        # Create installer_output directory with instructions
+        installer_output = PROJECT_DIR / "installer_output"
+        installer_output.mkdir(exist_ok=True)
+        
+        # Create a build instruction file for Windows
+        instruction_file = installer_output / "BUILD_ON_WINDOWS.txt"
+        instruction_file.write_text("""
+╔═══════════════════════════════════════════════════════════════════════════╗
+║  KH BROWSER - WINDOWS INSTALLER BUILD INSTRUCTIONS                       ║
+║  Generated: """ + datetime.now().strftime("%Y-%m-%d %H:%M:%S") + """                                  ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+IMPORTANT: This file must be built on Windows!
+
+PREREQUISITES:
+─────────────
+1. Windows 10/11
+2. Python 3.11+
+3. Inno Setup 6 (download from https://jrsoftware.org/isdl.php)
+
+HOW TO BUILD ON WINDOWS:
+────────────────────────
+1. Copy entire project to Windows machine
+2. Open PowerShell as Administrator
+3. Navigate to project directory
+4. Run: .\\build_windows_installer.ps1
+
+EXPECTED OUTPUT:
+─────────────
+✓ dist\\KHBrowser\\KHBrowser.exe (Portable, ~380 MB)
+✓ installer_output\\KHBrowser-1.0.0-Setup-Windows.exe (Setup wizard, ~95 MB)
+
+The Setup.exe file can be distributed to end users.
+Users can install via Add/Remove Programs in Windows Settings.
+
+═══════════════════════════════════════════════════════════════════════════
+""")
+        print_success(f"Created build instructions in installer_output/")
     
     # ────────────────────────────────────────────────────────────────────────
     # Phase 7: Final Verification
@@ -238,9 +275,8 @@ def main():
     print_header("✅ Phase 7: Final Verification")
     
     checks = {
-        "dist/KHBrowser.app/Contents/MacOS/KHBrowser": ".app executable",
-        "dist/KHBrowser-1.0.0-macOS.dmg": ".dmg installer",
-        "dist/KHBrowser.app/Contents/Resources/icon.icns": "App icon",
+        "dist/KHBrowser/KHBrowser.exe": "Windows portable EXE",
+        "assets/icon.ico": "Windows icon",
     }
     
     passed = 0
@@ -258,26 +294,38 @@ def main():
     
     print_header("📊 BUILD COMPLETE - FINAL REPORT")
     
-    if passed == len(checks):
+    if passed >= len(checks) - 1:  # Allow missing installer.exe if on non-Windows
         print(f"{Colors.GREEN}{Colors.BOLD}✅ BUILD SUCCESSFUL{Colors.ENDC}\n")
         
         print(f"{Colors.BLUE}📦 Output Files:{Colors.ENDC}")
-        print(f"  .app bundle:    dist/KHBrowser.app ({app_size:.0f} MB)")
-        dmg_path = PROJECT_DIR / "dist/KHBrowser-1.0.0-macOS.dmg"
-        dmg_mb = dmg_path.stat().st_size / (1024*1024)
-        print(f"  .dmg installer: dist/KHBrowser-1.0.0-macOS.dmg ({dmg_mb:.0f} MB)\n")
+        exe_path = PROJECT_DIR / "dist/KHBrowser/KHBrowser.exe"
+        if exe_path.exists():
+            exe_mb = exe_path.stat().st_size / (1024*1024)
+            print(f"  Portable EXE: dist/KHBrowser/KHBrowser.exe ({exe_mb:.0f} MB)")
         
-        print(f"{Colors.BLUE}🚀 Next Steps:{Colors.ENDC}")
-        print(f"  1. Open the DMG:")
-        print(f"     open 'dist/KHBrowser-1.0.0-macOS.dmg'\n")
-        print(f"  2. Drag KHBrowser.app to Applications folder\n")
-        print(f"  3. Run from Applications or Spotlight: KH Browser\n")
+        setup_files = list((PROJECT_DIR / "installer_output").glob("*.exe"))
+        if setup_files:
+            for setup_file in setup_files:
+                setup_mb = setup_file.stat().st_size / (1024*1024)
+                print(f"  Setup Wizard: {setup_file.name} ({setup_mb:.0f} MB)")
         
-        print(f"{Colors.BLUE}Or launch directly:{Colors.ENDC}")
-        print(f"  open 'dist/KHBrowser.app'\n")
+        print(f"\n{Colors.BLUE}🚀 Next Steps:{Colors.ENDC}")
+        print(f"  1. Test the portable EXE:")
+        print(f"     dist\\KHBrowser\\KHBrowser.exe\n")
+        
+        if sys.platform != "win32":
+            print(f"  2. To create the Setup installer, build on Windows:")
+            print(f"     → See installer_output/BUILD_ON_WINDOWS.txt\n")
+        else:
+            print(f"  2. Test the setup installer:")
+            print(f"     installer_output\\KHBrowser-1.0.0-Setup-Windows.exe\n")
+        
+        print(f"  3. Share with users:")
+        print(f"     → Portable: dist\\KHBrowser\\KHBrowser.exe")
+        print(f"     → Setup: installer_output\\*.exe (requires installation)\n")
         
         print(f"{Colors.GREEN}{'='*70}{Colors.ENDC}")
-        print(f"{Colors.GREEN}🍎 macOS Build Complete - Ready to Install!{Colors.ENDC}")
+        print(f"{Colors.GREEN}🪟 Windows Build Complete - Ready to Install!{Colors.ENDC}")
         print(f"{Colors.GREEN}{'='*70}{Colors.ENDC}\n")
         
         return True

@@ -13,7 +13,7 @@ def main():
 
     app = QApplication(sys.argv)
     app.setApplicationName("KH Browser")
-    app.setApplicationVersion("1.0.0")
+    app.setApplicationVersion("2.0.0")
     app.setOrganizationName("KHBrowser")
 
     from main_window import MainWindow

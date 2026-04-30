@@ -326,6 +326,11 @@ class ProfilePanel(QWidget):
         self.profiles_per_page = 8  # Show 8 profiles per page for cleaner layout
         self._build()
         self._populate()
+        # Setup realtime refresh timer
+        self.refresh_timer = QTimer(self)
+        self.refresh_timer.timeout.connect(self._refresh_profiles_realtime)
+        self.refresh_timer.start(2000)  # Refresh every 2 seconds
+        self._last_profile_count = len(self.profiles)
 
     # ── Column indices ────────────────────────────────────────────────────────
     COL_CHK     = 0
@@ -354,7 +359,7 @@ class ProfilePanel(QWidget):
 
         # ── Top bar with gradient ─────────────────────────────────────────────
         top = QWidget()
-        top.setFixedHeight(80)
+        top.setFixedHeight(90)
         top.setStyleSheet("""
             QWidget {
                 background: qlineargradient(x1:0,y1:0,x2:1,y2:0,
@@ -364,14 +369,14 @@ class ProfilePanel(QWidget):
             }
         """)
         tl = QHBoxLayout(top)
-        tl.setContentsMargins(28, 14, 28, 14)
-        tl.setSpacing(14)
+        tl.setContentsMargins(32, 16, 32, 16)
+        tl.setSpacing(16)
 
         # Search with gradient border
         self.search_box = QLineEdit()
         self.search_box.setPlaceholderText("🔍  Search profiles…")
-        self.search_box.setFixedHeight(42)
-        self.search_box.setMinimumWidth(300)
+        self.search_box.setFixedHeight(44)
+        self.search_box.setMinimumWidth(320)
         self.search_box.setStyleSheet("""
             QLineEdit {
                 background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
@@ -477,7 +482,7 @@ class ProfilePanel(QWidget):
         btn_configs = [
             ("✨  New Profile", "#f97316", "#fb923c", "#c2410c", self._new_profile),
             ("⚡  Batch",       "#1e3a5f", "#2a5a8f", "#0f1f35", self._batch),
-            ("☁️  Sync",        "#1e3a5f", "#2a5a8f", "#0f1f35", self._sync),
+            ("🔄  Update",      "#1e3a5f", "#2a5a8f", "#0f1f35", self._update_profiles),
         ]
         for label, bg, hover, active, handler in btn_configs:
             b = QPushButton(label)
@@ -520,8 +525,8 @@ class ProfilePanel(QWidget):
             }
         """)
         sl = QHBoxLayout(sub)
-        sl.setContentsMargins(28, 10, 28, 10)
-        sl.setSpacing(12)
+        sl.setContentsMargins(32, 12, 32, 12)
+        sl.setSpacing(14)
 
         def _sub_btn(label, color="#94a3b8", bg="#0e1420", hover="#1a2840", accent=False):
             b = QPushButton(label)
@@ -577,20 +582,26 @@ class ProfilePanel(QWidget):
         self.profile_count_lb.setStyleSheet("color:#475569; font-size:13px; padding:0 10px; font-weight:500;")
 
         self.open_btn   = _sub_btn("▶  Open",    "#22c55e", "#0a1f13", "#14532d")
+        self.openall_btn = _sub_btn("Open All", "#22c55e", "#0a1f13", "#14532d")
+        self.closeall_btn = _sub_btn("⏹  Close All", "#f97316", "#451a03", "#78350f")
+        self.donate_btn = _sub_btn("💝  Donate", "#ec4899", "#831843", "#be185d")
         self.delete_btn = _sub_btn("🗑  Delete",  "#f87171", "#1a0a0a", "#450a0a")
         self.download_btn = _sub_btn("⬇  Download", "#2563EB", "#0c2e5c", "#1e4a8e")
-        self.next_btn = _sub_btn("Next  ▶", "#10b981", "#0a1f13", "#14532d")
 
         self.open_btn.clicked.connect(self._open_selected)
+        self.openall_btn.clicked.connect(self._open_all)
+        self.closeall_btn.clicked.connect(self._close_all)
+        self.donate_btn.clicked.connect(self._show_donate_qr)
         self.delete_btn.clicked.connect(self._delete_selected)
         self.download_btn.clicked.connect(self._download_profiles)
-        self.next_btn.clicked.connect(self._next_page)
 
         sl.addWidget(self.sel_all_btn)
         sl.addWidget(self.profile_count_lb)
         sl.addStretch()
         sl.addWidget(self.download_btn)
-        sl.addWidget(self.next_btn)
+        sl.addWidget(self.donate_btn)
+        sl.addWidget(self.openall_btn)
+        sl.addWidget(self.closeall_btn)
         sl.addWidget(self.open_btn)
         sl.addWidget(self.delete_btn)
         lay.addWidget(sub)
@@ -631,9 +642,9 @@ class ProfilePanel(QWidget):
                 outline: none;
             }
             QTableWidget::item {
-                padding: 0px;
+                padding: 4px 8px;
                 border: none;
-                height: 60px;
+                height: 64px;
                 border-bottom: 1px solid rgba(30, 45, 69, 0.3);
             }
             QTableWidget::item:selected {
@@ -701,7 +712,7 @@ class ProfilePanel(QWidget):
         self.table.setShowGrid(False)
         self.table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.table.customContextMenuRequested.connect(self._context_menu)
-        self.table.setRowHeight(0, 56)
+        self.table.setRowHeight(0, 60)
         lay.addWidget(self.table, 1)
 
     # ── Helpers ───────────────────────────────────────────────────────────────
@@ -784,7 +795,7 @@ class ProfilePanel(QWidget):
         for orig_idx, p in paginated_profiles:
             r = self.table.rowCount()
             self.table.insertRow(r)
-            self.table.setRowHeight(r, 60)
+            self.table.setRowHeight(r, 64)
 
             # ── COL 0: Checkbox ───────────────────────────────────────────────
             from PyQt6.QtWidgets import QCheckBox
@@ -1079,9 +1090,6 @@ class ProfilePanel(QWidget):
             f"{page_info}{shown} shown  ·  {running} running  ·  {len(self.profiles)} total"
         )
         
-        # Update Next button state (disable on last page)
-        self.next_btn.setEnabled(self.current_page < total_pages - 1 if total_pages > 1 else False)
-        
         # Reset select all button state after populating
         self._update_select_btn()
 
@@ -1092,6 +1100,24 @@ class ProfilePanel(QWidget):
             self.group_filter.currentText(),
             self.status_filter.currentText(),
         )
+
+    def _refresh_profiles_realtime(self):
+        """Reload profiles from storage and update UI if changed."""
+        try:
+            new_profiles = storage.load_profiles()
+            # Check if profiles changed (count or content)
+            if len(new_profiles) != self._last_profile_count or new_profiles != self.profiles:
+                self.profiles = new_profiles
+                self._last_profile_count = len(self.profiles)
+                # Smooth refresh: repopulate with current filters
+                self._populate(
+                    self.search_box.text(),
+                    self.group_filter.currentText(),
+                    self.status_filter.currentText(),
+                )
+        except Exception as e:
+            print(f"[ProfilePanel] Realtime refresh error: {e}")
+
 
     def _toggle_profile(self, profile: BrowserProfile):
         if profile.status == "running":
@@ -1261,6 +1287,62 @@ class ProfilePanel(QWidget):
         for p in sel:
             self._toggle_profile(p)
 
+    def _open_all(self):
+        """Open all profiles."""
+        for p in self.profiles:
+            if p.status != "running":
+                self._toggle_profile(p)
+
+    def _close_all(self):
+        """Close all running profiles."""
+        for p in self.profiles:
+            if p.status == "running":
+                self._toggle_profile(p)
+
+    def _show_donate_qr(self):
+        """Show donation QR code popup."""
+        import os
+        qr_path = os.path.join(os.path.dirname(__file__), "qr", "qr.jpg")
+        
+        if not os.path.exists(qr_path):
+            QMessageBox.information(self, "Donate", "QR code not found")
+            return
+        
+        dialog = QDialog(self)
+        dialog.setWindowTitle("💝 Donate")
+        dialog.setFixedSize(400, 450)
+        dialog.setStyleSheet("background: #0F172A;")
+        
+        lay = QVBoxLayout(dialog)
+        lay.setContentsMargins(20, 20, 20, 20)
+        lay.setSpacing(16)
+        
+        title = QLabel("Support KH Browser")
+        title.setStyleSheet("font-size:18px; font-weight:700; color:#f1f5f9;")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        lay.addWidget(title)
+        
+        qr_label = QLabel()
+        qr_pixmap = QPixmap(qr_path)
+        qr_label.setPixmap(qr_pixmap.scaled(300, 300, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
+        qr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        lay.addWidget(qr_label)
+        
+        text = QLabel("Scan to donate")
+        text.setStyleSheet("color:#64748b; font-size:13px;")
+        text.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        lay.addWidget(text)
+        
+        lay.addStretch()
+        
+        close_btn = QPushButton("Close")
+        close_btn.setFixedHeight(36)
+        close_btn.setObjectName("primaryBtn")
+        close_btn.clicked.connect(dialog.accept)
+        lay.addWidget(close_btn)
+        
+        dialog.exec()
+
     def _delete_selected(self):
         sel = self._get_selected()
         if not sel:
@@ -1281,11 +1363,6 @@ class ProfilePanel(QWidget):
                     self.profiles.remove(p)
             self._save()
             self._filter()
-
-    def _next_page(self):
-        """Navigate to next page of profiles."""
-        self.current_page += 1
-        self._filter()
 
     def _download_profiles(self):
         """Export selected profiles (or all) to JSON file."""
@@ -1638,6 +1715,12 @@ class ProfilePanel(QWidget):
         self.mw.statusBar().showMessage("☁️  Syncing profiles to cloud…", 2000)
         QTimer.singleShot(2500, lambda: self.mw.statusBar().showMessage("✅  Cloud sync complete", 3000))
 
+    def _update_profiles(self):
+        """Refresh/reload profiles from storage and update UI."""
+        self.profiles = storage.load_profiles()
+        self._filter()
+        self.mw.statusBar().showMessage("✅ Profiles updated", 3000)
+
     def _context_menu(self, pos):
         idx = self.table.indexAt(pos)
         if not idx.isValid() or idx.row() >= len(self.profiles):
@@ -1681,6 +1764,11 @@ def _placeholder(icon, title, subtitle=""):
         sb.setStyleSheet("color:#64748b;font-size:13px;")
         lay.addWidget(sb)
     return w
+
+    def cleanup(self):
+        """Stop realtime refresh timer when panel is destroyed."""
+        if hasattr(self, 'refresh_timer') and self.refresh_timer.isActive():
+            self.refresh_timer.stop()
 
 
 # ── Main Window ────────────────────────────────────────────────────────────────

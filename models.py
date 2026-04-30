@@ -204,30 +204,6 @@ class APIKey:
 # ── Sample Data ────────────────────────────────────────────────────────────────
 
 SAMPLE_PROFILES = [
-    BrowserProfile(id="A1B2C3D4", name="FB Account 1", group="Facebook",
-                   browser_type="Chrome", os_type="Windows", status="stopped",
-                   last_used="2024-01-15 10:30", cloud_synced=True),
-    BrowserProfile(id="E5F6G7H8", name="Instagram Pro", group="Social Media",
-                   browser_type="Firefox", os_type="macOS", status="running",
-                   last_used="2024-01-15 09:15", cloud_synced=True),
-    BrowserProfile(id="I9J0K1L2", name="Shopify Store", group="E-commerce",
-                   browser_type="Chrome", os_type="Windows", status="stopped",
-                   last_used="2024-01-14 18:22"),
-    BrowserProfile(id="M3N4O5P6", name="Twitter Bot", group="Social Media",
-                   browser_type="Edge", os_type="Windows", status="stopped",
-                   last_used="2024-01-14 15:45"),
-    BrowserProfile(id="Q7R8S9T0", name="Amazon Seller", group="E-commerce",
-                   browser_type="Chrome", os_type="Windows", status="running",
-                   last_used="2024-01-15 08:00", cloud_synced=True),
-    BrowserProfile(id="U1V2W3X4", name="TikTok Creator", group="Content",
-                   browser_type="Chrome", os_type="macOS", status="stopped",
-                   last_used="2024-01-13 20:10"),
-    BrowserProfile(id="Y5Z6A7B8", name="LinkedIn Outreach", group="B2B",
-                   browser_type="Chrome", os_type="Windows", status="stopped",
-                   last_used="2024-01-12 11:00"),
-    BrowserProfile(id="C9D0E1F2", name="Reddit Account", group="Social Media",
-                   browser_type="Firefox", os_type="Linux", status="stopped",
-                   last_used="2024-01-11 14:30"),
 ]
 
 SAMPLE_MEMBERS = [

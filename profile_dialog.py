@@ -587,6 +587,84 @@ class ExtensionsTab(QWidget):
         return result
 
 
+class SettingsTab(QWidget):
+    """Profile-specific layout and sidebar settings."""
+    def __init__(self, profile: BrowserProfile):
+        super().__init__()
+        self.profile = profile
+        self._build()
+
+    def _build(self):
+        lay = QVBoxLayout(self)
+        lay.setContentsMargins(20, 20, 20, 20)
+        lay.setSpacing(16)
+
+        lay.addWidget(_label("Sidebar Settings"))
+        lay.addWidget(_h_sep())
+        
+        self.sidebar_visible = QCheckBox("Show sidebar by default")
+        self.sidebar_visible.setChecked(getattr(self.profile, 'sidebar_visible', True))
+        lay.addWidget(self.sidebar_visible)
+
+        sb_width_lay = QHBoxLayout()
+        sb_width_lay.addWidget(QLabel("Sidebar width (px):"))
+        self.sidebar_width = QSpinBox()
+        self.sidebar_width.setMinimum(150)
+        self.sidebar_width.setMaximum(500)
+        self.sidebar_width.setValue(getattr(self.profile, 'sidebar_width', 220))
+        sb_width_lay.addWidget(self.sidebar_width)
+        sb_width_lay.addStretch()
+        lay.addLayout(sb_width_lay)
+
+        lay.addWidget(_h_sep())
+        lay.addWidget(_label("Layout Settings"))
+        lay.addWidget(_h_sep())
+
+        self.compact_mode = QCheckBox("Compact mode (smaller spacing)")
+        self.compact_mode.setChecked(getattr(self.profile, 'compact_mode', False))
+        lay.addWidget(self.compact_mode)
+
+        self.dark_mode = QCheckBox("Dark theme")
+        self.dark_mode.setChecked(getattr(self.profile, 'dark_mode', True))
+        lay.addWidget(self.dark_mode)
+
+        font_size_lay = QHBoxLayout()
+        font_size_lay.addWidget(QLabel("Default font size:"))
+        self.font_size = QSpinBox()
+        self.font_size.setMinimum(10)
+        self.font_size.setMaximum(20)
+        self.font_size.setValue(getattr(self.profile, 'font_size', 13))
+        font_size_lay.addWidget(self.font_size)
+        font_size_lay.addStretch()
+        lay.addLayout(font_size_lay)
+
+        lay.addWidget(_h_sep())
+        lay.addWidget(_label("Real-time Settings"))
+        lay.addWidget(_h_sep())
+
+        self.realtime_sync = QCheckBox("Enable real-time settings sync")
+        self.realtime_sync.setChecked(getattr(self.profile, 'realtime_sync', True))
+        lay.addWidget(self.realtime_sync)
+
+        self.auto_refresh = QCheckBox("Auto-refresh profile list")
+        self.auto_refresh.setChecked(getattr(self.profile, 'auto_refresh', True))
+        lay.addWidget(self.auto_refresh)
+
+        lay.addStretch()
+
+    def get_data(self):
+        """Return settings as dict."""
+        return {
+            'sidebar_visible': self.sidebar_visible.isChecked(),
+            'sidebar_width': self.sidebar_width.value(),
+            'compact_mode': self.compact_mode.isChecked(),
+            'dark_mode': self.dark_mode.isChecked(),
+            'font_size': self.font_size.value(),
+            'realtime_sync': self.realtime_sync.isChecked(),
+            'auto_refresh': self.auto_refresh.isChecked(),
+        }
+
+
 # ── Main Dialog ────────────────────────────────────────────────────────────────
 
 class ProfileDialog(QDialog):
@@ -629,6 +707,7 @@ class ProfileDialog(QDialog):
         self.tz_tab = TimezoneTab(self.profile)
         self.accts_tab = AccountsTab(self.profile)
         self.ext_tab = ExtensionsTab(self.profile)
+        self.settings_tab = SettingsTab(self.profile)
 
         self.tabs.addTab(self.basic_tab, "📋  Basic")
         self.tabs.addTab(self.fp_tab, "🔬  Fingerprint")
@@ -636,6 +715,7 @@ class ProfileDialog(QDialog):
         self.tabs.addTab(self.tz_tab, "🕒  Timezone")
         self.tabs.addTab(self.accts_tab, "👤  Accounts")
         self.tabs.addTab(self.ext_tab, "🧩  Extensions")
+        self.tabs.addTab(self.settings_tab, "⚙️  Settings")
 
         root.addWidget(self.tabs, 1)
 
@@ -695,6 +775,10 @@ class ProfileDialog(QDialog):
         self.profile.proxy = self.proxy_tab.get_data()
         self.profile.accounts = self.accts_tab.get_data()
         self.profile.extensions = self.ext_tab.get_data()
+
+        settings_data = self.settings_tab.get_data()
+        for k, v in settings_data.items():
+            setattr(self.profile, k, v)
 
         QMessageBox.information(self, "Success", "✅  Profile saved successfully with all validation rules passed.")
         self.profile_saved.emit(self.profile)

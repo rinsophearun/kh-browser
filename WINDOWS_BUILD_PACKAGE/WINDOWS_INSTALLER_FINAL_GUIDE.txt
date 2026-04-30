@@ -1,0 +1,399 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║     KH BROWSER v2.0.0 - WINDOWS APPLICATION EXE INSTALLER BUILD         ║
+║                                                                           ║
+║            Complete Step-by-Step Guide for Windows 10/11                 ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+
+WHAT YOU'LL GET:
+═════════════════════════════════════════════════════════════════════════════
+
+After following this guide, you'll have TWO complete Windows installers:
+
+1️⃣  PORTABLE EXECUTABLE
+    File: KHBrowser.exe (~380 MB)
+    Type: Standalone, no installation required
+    Usage: Double-click to run immediately
+    
+2️⃣  SETUP INSTALLER  
+    File: KHBrowser-2.0.0-Setup-Windows.exe (~95 MB)
+    Type: Windows Setup Wizard
+    Usage: Runs installer, adds to Start menu
+    Features: Standard Windows installation experience
+
+
+PREREQUISITES:
+═════════════════════════════════════════════════════════════════════════════
+
+✓ Windows 10 or Windows 11 (64-bit recommended)
+✓ Administrator access
+✓ 5 GB free disk space
+✓ Internet connection (for downloading dependencies)
+
+
+STEP 1: INSTALL PYTHON 3.11+
+═════════════════════════════════════════════════════════════════════════════
+
+1. Open web browser
+2. Go to: https://www.python.org/downloads/
+3. Click "Download Python 3.12.x" (or latest 3.11+)
+4. Run the installer
+5. ⚠️  IMPORTANT: CHECK THE BOX "Add Python to PATH"
+6. Click "Install Now"
+7. Wait for installation (~2 minutes)
+8. Verify installation:
+   • Open Command Prompt (Win+R → cmd → Enter)
+   • Type: python --version
+   • Should show: Python 3.11.x or higher
+
+
+STEP 2: INSTALL INNO SETUP 6 (FREE)
+═════════════════════════════════════════════════════════════════════════════
+
+1. Open web browser
+2. Go to: https://jrsoftware.org/isdl.php
+3. Find "inno-6.x.x.exe" (about 5-6 MB file)
+4. Download it
+5. Run the installer
+6. Click through default settings
+7. Click "Install"
+8. Click "Finish"
+9. Wait for installation to complete (~1 minute)
+
+
+STEP 3: DOWNLOAD KH BROWSER BUILD PACKAGE
+═════════════════════════════════════════════════════════════════════════════
+
+Option A: From GitHub (Recommended)
+────────────────────────────────────
+1. Go to: https://github.com/rinsophearun/kh-browser
+2. Click green "Code" button
+3. Click "Download ZIP"
+4. Extract to a folder (e.g., C:\Users\YourName\Documents\KH browser)
+5. Open the extracted folder
+6. Navigate to: WINDOWS_BUILD_PACKAGE folder
+
+Option B: Copy from Source
+──────────────────────────
+If you have the source folder, copy: WINDOWS_BUILD_PACKAGE folder
+To: C:\Users\YourName\Documents\ (or any location)
+
+
+STEP 4: OPEN COMMAND PROMPT IN THE BUILD FOLDER
+═════════════════════════════════════════════════════════════════════════════
+
+METHOD A: Via File Explorer (Easiest)
+──────────────────────────────────────
+1. Open Windows File Explorer
+2. Navigate to: WINDOWS_BUILD_PACKAGE folder
+3. Hold down SHIFT
+4. Right-click empty space in folder
+5. Select: "Open command window here" OR "Open PowerShell window here"
+6. Command prompt will open in that folder
+
+METHOD B: Via Command Prompt
+─────────────────────────────
+1. Press Win+R
+2. Type: cmd
+3. Press Enter
+4. Type: cd C:\Path\To\WINDOWS_BUILD_PACKAGE
+5. Press Enter
+
+
+STEP 5: RUN THE BUILD
+═════════════════════════════════════════════════════════════════════════════
+
+OPTION A: Windows Command Prompt (Easiest)
+────────────────────────────────────────────
+1. In command prompt, type: BUILD.bat
+2. Press Enter
+3. Watch as it builds (will take 10-15 minutes on first build)
+4. See progress messages
+
+
+OPTION B: Windows PowerShell
+─────────────────────────────
+1. Open PowerShell as Administrator
+   (Right-click Start → Windows PowerShell (Admin))
+2. Navigate: cd C:\Path\To\WINDOWS_BUILD_PACKAGE
+3. Type: powershell -ExecutionPolicy Bypass -File BUILD.ps1
+4. Press Enter
+5. Wait for build to complete (10-15 minutes)
+
+
+OPTION C: Manual Command
+────────────────────────
+Copy and paste this entire command in PowerShell or CMD:
+
+python -m venv venv
+.\venv\Scripts\activate
+pip install -r requirements.txt
+python build_windows_complete.py
+
+
+DURING BUILD:
+═════════════════════════════════════════════════════════════════════════════
+
+⏳ Expected timeframes:
+   Phase 1-4: ~5 minutes (quick setup)
+   Phase 5:   ~5-10 minutes (PyInstaller - longest, may seem slow)
+   Phase 6:   ~2-5 minutes (Inno Setup)
+   Phase 7:   <1 minute (verification)
+
+🔄 What you should see:
+   ✅ Checking Python installation
+   ✅ Checking Inno Setup installation
+   ✅ Creating virtual environment
+   ✅ Installing dependencies (PyQt6, PyInstaller, etc)
+   ✅ Cleaning previous builds
+   ✅ Running PyInstaller build
+   ✅ Creating Windows installer
+   ✅ Final verification
+
+⚠️ Important:
+   • Do NOT close the command window
+   • Do NOT interrupt the process
+   • First build takes 10-15 minutes (normal!)
+   • Subsequent builds are faster
+
+
+AFTER BUILD COMPLETES:
+═════════════════════════════════════════════════════════════════════════════
+
+SUCCESS MESSAGE:
+You should see:
+   ╔═══════════════════════════════════════════════════════════════════════╗
+   ║                    ✅ BUILD COMPLETED SUCCESSFULLY!                   ║
+   ╚═══════════════════════════════════════════════════════════════════════╝
+
+
+OUTPUT FILES LOCATIONS:
+═════════════════════════════════════════════════════════════════════════════
+
+Both files will be created in the same folder where you ran the build:
+
+📦 Portable Executable:
+   dist\KHBrowser\KHBrowser.exe
+   Size: ~380 MB
+   This can be shared with users - no installation needed!
+
+📦 Setup Installer:
+   installer_output\KHBrowser-2.0.0-Setup-Windows.exe
+   Size: ~95 MB
+   This is the traditional installer users expect
+
+
+VERIFY ICONS ARE EMBEDDED:
+═════════════════════════════════════════════════════════════════════════════
+
+1. Find each .exe file
+2. Right-click on it
+3. Select "Properties"
+4. Look at the icon in the top-left
+5. ✓ Should show KH Browser logo (orange/color icon)
+6. ✗ Should NOT be generic gray executable icon
+
+
+TESTING PORTABLE VERSION:
+═════════════════════════════════════════════════════════════════════════════
+
+1. Double-click: dist\KHBrowser\KHBrowser.exe
+2. Wait 5-10 seconds for app to launch
+3. You should see:
+   ✓ KH Browser main window
+   ✓ Profiles panel visible
+   ✓ All buttons visible:
+     • ✨ New Profile
+     • ⚡ Batch
+     • 🔄 Update
+     • 🟢 Open All
+     • 🟠 Close All
+     • 💝 Donate
+4. Click "Donate" button → Should show QR code popup
+5. Close the popup
+6. Right-click on a profile (if any) → Edit → Check "Settings" tab
+7. Click the Settings tab → Should show 7 configuration options
+8. Close the application normally
+9. ✓ App should close without errors
+
+
+TESTING INSTALLER:
+═════════════════════════════════════════════════════════════════════════════
+
+1. Double-click: installer_output\KHBrowser-2.0.0-Setup-Windows.exe
+2. Wait for setup wizard to appear
+3. Click "I accept the agreement"
+4. Click "Next"
+5. Choose installation folder (C:\Program Files\KHBrowser recommended)
+6. Click "Next"
+7. Check "Create shortcut on desktop" (optional)
+8. Click "Next"
+9. Check "Launch KH Browser" 
+10. Click "Install"
+11. Wait for installation (~1-2 minutes)
+12. Click "Finish"
+13. Application should launch automatically
+14. Verify same features as portable version work
+15. Close application
+16. Check Start menu for "KH Browser" shortcut
+17. Click the shortcut to verify it works
+
+
+DISTRIBUTE TO USERS:
+═════════════════════════════════════════════════════════════════════════════
+
+✅ For General Users (Recommended):
+   Share: installer_output\KHBrowser-2.0.0-Setup-Windows.exe
+   Size: ~95 MB
+   They get traditional Windows installer experience
+
+✅ For Tech-Savvy Users:
+   Share: dist\KHBrowser\KHBrowser.exe
+   Size: ~380 MB
+   They get portable version, no installation needed
+
+✅ Upload Both to:
+   • GitHub Releases: https://github.com/rinsophearun/kh-browser/releases
+   • Your website/download page
+   • Cloud storage (Google Drive, OneDrive, Dropbox)
+
+
+SYSTEM REQUIREMENTS FOR END USERS:
+═════════════════════════════════════════════════════════════════════════════
+
+Include this with your distribution:
+
+Minimum Requirements:
+   ✓ Windows 10 (version 1909 or later) or Windows 11
+   ✓ 64-bit processor and OS
+   ✓ 500 MB free disk space
+   ✓ Internet connection for browser features
+
+Recommended:
+   ✓ Windows 11 64-bit
+   ✓ 4+ GB RAM
+   ✓ SSD for faster startup
+   ✓ Modern GPU with OpenGL support
+
+
+TROUBLESHOOTING:
+═════════════════════════════════════════════════════════════════════════════
+
+❌ "Python not found" or "python is not recognized"
+   SOLUTION:
+   1. Reinstall Python from https://www.python.org/downloads/
+   2. ✓ CHECK "Add Python to PATH" during installation
+   3. RESTART your computer
+   4. Try build again
+
+❌ "pip: command not found"
+   SOLUTION:
+   1. Verify Python installed: python --version
+   2. Use: python -m pip install -r requirements.txt
+   3. Continue with build
+
+❌ "Inno Setup not found" (C:\Program Files (x86)\Inno Setup 6\ISCC.exe)
+   SOLUTION:
+   1. Download from: https://jrsoftware.org/isdl.php
+   2. Run installer with default settings
+   3. RESTART PowerShell/CMD window
+   4. Try build again
+
+❌ "Permission denied" or "Access denied"
+   SOLUTION:
+   1. Close any running KH Browser windows
+   2. Run CMD/PowerShell as Administrator
+   3. Try build again
+
+❌ "Not enough space"
+   SOLUTION:
+   1. Free up 5+ GB disk space
+   2. Delete temporary files
+   3. Try build again
+
+❌ Build hangs or seems stuck
+   SOLUTION:
+   1. First build can take 10-15 minutes - WAIT
+   2. Check Task Manager for "python.exe" or "pyinstaller"
+   3. If stuck: Press Ctrl+C to cancel
+   4. Retry the build
+
+
+SUCCESSFUL BUILD CHECKLIST:
+═════════════════════════════════════════════════════════════════════════════
+
+✓ Both .exe files created
+✓ Portable: dist\KHBrowser\KHBrowser.exe (~380 MB)
+✓ Installer: installer_output\*.exe (~95 MB)
+✓ Icons embedded (not generic icon)
+✓ Portable version launches without errors
+✓ All buttons visible and clickable
+✓ Settings tab opens with 7 options
+✓ Donate button shows QR code
+✓ Installer runs without errors
+✓ Installation completes successfully
+✓ Start menu shortcut created
+✓ Shortcut launches application
+✓ No error messages during build
+✓ Build completed with "✅ BUILD SUCCESSFUL" message
+
+
+AFTER FIRST SUCCESSFUL BUILD:
+═════════════════════════════════════════════════════════════════════════════
+
+Future builds:
+   • Just run: BUILD.bat or BUILD.ps1 again
+   • Takes 10-15 minutes each time
+   • Previous builds cleaned automatically
+   • No need to reinstall Python or Inno Setup
+
+
+NEXT STEPS:
+═════════════════════════════════════════════════════════════════════════════
+
+1. ✅ Complete the build process (10-15 minutes)
+2. ✅ Test both .exe files thoroughly
+3. ✅ Upload to GitHub Releases or your hosting
+4. ✅ Create release notes describing v2.0.0 features
+5. ✅ Share download links with users
+6. ✅ Document system requirements for users
+
+
+V2.0.0 RELEASE NOTES FOR USERS:
+═════════════════════════════════════════════════════════════════════════════
+
+KH Browser v2.0.0 - Major Release
+
+🎉 NEW FEATURES:
+   ✨ Open All / Close All buttons for batch operations
+   💝 Donate button with QR code popup
+   🔄 Update button for manual profile refresh
+   ⚙️  Settings tab with 7 per-profile configuration options
+   ⏱️  Real-time auto-refresh (profiles update every 2 seconds)
+
+🎨 UI IMPROVEMENTS:
+   • Better spacing and layout
+   • Improved button styling with gradients
+   • Optimized table rendering
+   • Enhanced visual hierarchy
+
+🔧 TECHNICAL:
+   • Updated to version 2.0.0
+   • Cleaned up sample profiles
+   • Improved code architecture
+   • Better error handling
+
+📊 DOWNLOADS:
+   • Portable (no installation): KHBrowser.exe (~380 MB)
+   • Setup Installer: KHBrowser-2.0.0-Setup-Windows.exe (~95 MB)
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+Ready to build? Follow the steps above!
+
+Questions? See WINDOWS_BUILD_PACKAGE\README.txt for more details.
+
+═══════════════════════════════════════════════════════════════════════════
